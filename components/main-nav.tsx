@@ -15,6 +15,8 @@ import {
   ShoppingCart,
   Truck,
   Users,
+  Bell,
+  Activity,
 } from "lucide-react"
 
 interface MainNavProps {
@@ -51,6 +53,16 @@ export function MainNav({ className }: MainNavProps) {
       title: "Find Hospitals",
       href: "/patient-portal/hospitals",
       icon: <Map className="mr-2 h-4 w-4" />,
+    },
+    {
+      title: "Health Tracking",
+      href: "/patient-portal/tracking",
+      icon: <Activity className="mr-2 h-4 w-4" />,
+    },
+    {
+      title: "Notifications",
+      href: "/patient-portal/notifications",
+      icon: <Bell className="mr-2 h-4 w-4" />,
     },
   ]
 
@@ -90,6 +102,16 @@ export function MainNav({ className }: MainNavProps) {
       href: "/hospital-portal/orders",
       icon: <ShoppingCart className="mr-2 h-4 w-4" />,
     },
+    {
+      title: "Staff Management",
+      href: "/hospital-portal/staff",
+      icon: <Users className="mr-2 h-4 w-4" />,
+    },
+    {
+      title: "Analytics",
+      href: "/hospital-portal/analytics",
+      icon: <Activity className="mr-2 h-4 w-4" />,
+    },
   ]
 
   // Select the appropriate navigation items based on user type
@@ -97,19 +119,26 @@ export function MainNav({ className }: MainNavProps) {
 
   return (
     <nav className={cn("flex items-center space-x-4 lg:space-x-6", className)}>
-      {navItems.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={cn(
-            "flex items-center text-sm font-medium transition-colors hover:text-primary",
-            pathname === item.href ? "text-primary" : "text-muted-foreground",
-          )}
-        >
-          {item.icon}
-          {item.title}
-        </Link>
-      ))}
+      {navItems.map((item) => {
+        const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              "flex items-center text-sm font-medium transition-colors hover:text-primary relative group",
+              isActive ? "text-primary" : "text-muted-foreground",
+            )}
+          >
+            <span className={cn("flex items-center", isActive && "font-semibold")}>
+              {item.icon}
+              {item.title}
+            </span>
+            {isActive && <span className="absolute -bottom-2 left-0 right-0 h-0.5 bg-primary rounded-full" />}
+            <span className="absolute -bottom-2 left-0 right-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform rounded-full" />
+          </Link>
+        )
+      })}
     </nav>
   )
 }

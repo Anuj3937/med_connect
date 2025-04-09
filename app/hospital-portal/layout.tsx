@@ -1,55 +1,39 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Suspense } from "react"
-import { Bell, Search } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { MainNav } from "@/components/main-nav"
 import { UserNav } from "@/components/user-nav"
+import { MainNav } from "@/components/main-nav"
 import { ModeToggle } from "@/components/mode-toggle"
+import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: "Hospital Portal - MediConnect",
-  description: "Hospital portal for healthcare supply chain and resource management",
+  title: "Hospital Portal | MediConnect",
+  description: "MediConnect hospital portal for managing healthcare resources and supply chain",
 }
 
 export default function HospitalPortalLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-50 border-b bg-background">
+      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between py-4">
           <div className="flex items-center gap-8">
-            <h1 className="text-xl font-bold">MediConnect</h1>
+            <a href="/" className="flex items-center gap-2">
+              <span className="font-bold text-xl">MediConnect</span>
+              <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">Hospital</span>
+            </a>
             <MainNav />
           </div>
           <div className="flex items-center gap-4">
-            <div className="relative w-full max-w-sm lg:max-w-xs">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search..."
-                className="w-full bg-background pl-8 md:w-[300px] lg:w-[200px]"
-              />
-            </div>
-            <Button variant="outline" size="icon" className="relative">
-              <Bell className="h-4 w-4" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-[10px] font-medium text-white flex items-center justify-center">
-                5
-              </span>
-            </Button>
             <ModeToggle />
             <UserNav />
           </div>
         </div>
       </header>
-      <main className="flex-1">
-        <Suspense fallback={<div className="container py-6">Loading...</div>}>{children}</Suspense>
-      </main>
+      <main className="flex-1 bg-muted/20">{children}</main>
+      <Toaster />
     </div>
   )
 }

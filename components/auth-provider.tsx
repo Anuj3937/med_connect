@@ -5,110 +5,205 @@ import type React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 
-type User = {
-  type: "patient" | "hospital" | null
-  email: string | null
-  zipCode: string | null
-  hospitalName?: string | null
+type UserType = "patient" | "hospital" | null
+
+interface User {
+  id: string
+  email: string
+  name?: string
+  type: UserType
+  hospitalName?: string
+  zipCode?: string
+  role?: string
+  specialties?: string[]
+  profileImage?: string
 }
 
-type AuthContextType = {
+interface AuthContextType {
   user: User
-  isLoggedIn: boolean
-  login: (userData: User) => void
+  login: (email: string, password: string, rememberMe: boolean) => Promise<boolean>
   logout: () => void
+  isAuthenticated: boolean
+  isLoading: boolean
 }
 
 const AuthContext = createContext<AuthContextType>({
-  user: { type: null, email: null, zipCode: null },
-  isLoggedIn: false,
-  login: () => {},
+  user: { id: "", email: "", type: null },
+  login: async () => false,
   logout: () => {},
+  isAuthenticated: false,
+  isLoading: true,
 })
 
-export const useAuth = () => useContext(AuthContext)
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User>({ id: "", email: "", type: null })
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
   const pathname = usePathname()
-  const [isLoading, setIsLoading] = useState(true)
-  const [user, setUser] = useState<User>({ type: null, email: null, zipCode: null })
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  // Patient user data
+  const patientUsers = [
+    {
+      id: "p1",
+      email: "patient1@email.com",
+      password: "password123",
+      name: "John Smith",
+      type: "patient" as UserType,
+      zipCode: "12345",
+      profileImage: "/placeholder.svg?height=40&width=40",
+    },
+    {
+      id: "p2",
+      email: "patient2@email.com",
+      password: "patient2024",
+      name: "Sarah Johnson",
+      type: "patient" as UserType,
+      zipCode: "12345",
+      profileImage: "/placeholder.svg?height=40&width=40",
+    },
+    {
+      id: "p3",
+      email: "patient3@email.com",
+      password: "secure789",
+      name: "Michael Brown",
+      type: "patient" as UserType,
+      zipCode: "23456",
+      profileImage: "/placeholder.svg?height=40&width=40",
+    },
+  ]
+
+  // Hospital user data
+  const hospitalUsers = [
+    {
+      id: "h1",
+      email: "hospital1@med.com",
+      password: "hospital2024",
+      type: "hospital" as UserType,
+      hospitalName: "Memorial General Hospital",
+      zipCode: "12345",
+      role: "Administrator",
+      profileImage: "/placeholder.svg?height=40&width=40",
+    },
+    {
+      id: "h2",
+      email: "hospital2@med.com",
+      password: "staffaccess",
+      type: "hospital" as UserType,
+      hospitalName: "University Medical Center",
+      zipCode: "12345",
+      role: "Supply Manager",
+      profileImage: "/placeholder.svg?height=40&width=40",
+    },
+    {
+      id: "h3",
+      email: "hospital3@med.com",
+      password: "12345678",
+      type: "hospital" as UserType,
+      hospitalName: "Riverside Community Hospital",
+      zipCode: "23456",
+      role: "Resource Coordinator",
+      profileImage: "/placeholder.svg?height=40&width=40",
+    },
+  ]
 
   useEffect(() => {
     // Check if user is logged in from localStorage
-    const userType = localStorage.getItem("userType") as "patient" | "hospital" | null
-    const userEmail = localStorage.getItem("userEmail")
-    const userZipCode = localStorage.getItem("userZipCode")
-    const hospitalName = localStorage.getItem("hospitalName")
-    const loggedIn = localStorage.getItem("isLoggedIn") === "true"
+    const storedUser = localStorage.getItem("mediconnect-user")
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser)
+        setUser(parsedUser)
 
-    if (loggedIn && userType && userEmail) {
-      setUser({
-        type: userType,
-        email: userEmail,
-        zipCode: userZipCode,
-        hospitalName: hospitalName,
-      })
-      setIsLoggedIn(true)
+        // Redirect based on user type if on login page
+        if (pathname === "/login") {
+          if (parsedUser.type === "patient") {
+            router.push("/patient-portal")
+          } else if (parsedUser.type === "hospital") {
+            router.push("/hospital-portal")
+          }
+        }
+      } catch (error) {
+        console.error("Failed to parse stored user:", error)
+        localStorage.removeItem("mediconnect-user")
+      }
     }
 
     setIsLoading(false)
-  }, [])
+  }, [pathname, router])
 
+  // Redirect to appropriate portal based on user type
   useEffect(() => {
-    // Redirect logic based on auth state and current path
-    if (!isLoading) {
-      // Public routes that don't require authentication
-      const publicRoutes = ["/login", "/"]
-
-      // Routes that require patient authentication
-      const patientRoutes = ["/patient-portal"]
-
-      // Routes that require hospital authentication
-      const hospitalRoutes = ["/hospital-portal"]
-
-      if (!isLoggedIn && !publicRoutes.includes(pathname)) {
-        router.push("/login")
-      } else if (isLoggedIn) {
-        if (user.type === "patient" && hospitalRoutes.includes(pathname)) {
+    if (!isLoading && user.type) {
+      // If user is logged in but accessing wrong portal or login page
+      if (user.type === "patient" && pathname.startsWith("/hospital-portal")) {
+        router.push("/patient-portal")
+      } else if (user.type === "hospital" && pathname.startsWith("/patient-portal")) {
+        router.push("/hospital-portal")
+      } else if (pathname === "/login") {
+        if (user.type === "patient") {
           router.push("/patient-portal")
-        } else if (user.type === "hospital" && patientRoutes.includes(pathname)) {
+        } else if (user.type === "hospital") {
           router.push("/hospital-portal")
-        } else if (pathname === "/login" || pathname === "/") {
-          router.push(user.type === "patient" ? "/patient-portal" : "/hospital-portal")
         }
       }
+    } else if (!isLoading && !user.type && pathname !== "/login" && !pathname.startsWith("/public")) {
+      // If user is not logged in and trying to access protected routes
+      router.push("/login")
     }
-  }, [isLoggedIn, pathname, router, user.type, isLoading])
+  }, [user.type, pathname, router, isLoading])
 
-  const login = (userData: User) => {
-    setUser(userData)
-    setIsLoggedIn(true)
+  const login = async (email: string, password: string, rememberMe: boolean): Promise<boolean> => {
+    // Find user in patient list
+    const patientUser = patientUsers.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password,
+    )
 
-    // Store in localStorage
-    localStorage.setItem("userType", userData.type || "")
-    localStorage.setItem("userEmail", userData.email || "")
-    if (userData.zipCode) localStorage.setItem("userZipCode", userData.zipCode)
-    if (userData.hospitalName) localStorage.setItem("hospitalName", userData.hospitalName)
-    localStorage.setItem("isLoggedIn", "true")
+    // Find user in hospital list
+    const hospitalUser = hospitalUsers.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password,
+    )
+
+    // Set user if found
+    if (patientUser) {
+      const { password, ...userWithoutPassword } = patientUser
+      setUser(userWithoutPassword)
+      if (rememberMe) {
+        localStorage.setItem("mediconnect-user", JSON.stringify(userWithoutPassword))
+      }
+      router.push("/patient-portal")
+      return true
+    } else if (hospitalUser) {
+      const { password, ...userWithoutPassword } = hospitalUser
+      setUser(userWithoutPassword)
+      if (rememberMe) {
+        localStorage.setItem("mediconnect-user", JSON.stringify(userWithoutPassword))
+      }
+      router.push("/hospital-portal")
+      return true
+    }
+
+    return false
   }
 
   const logout = () => {
-    setUser({ type: null, email: null, zipCode: null })
-    setIsLoggedIn(false)
-
-    // Clear localStorage
-    localStorage.removeItem("userType")
-    localStorage.removeItem("userEmail")
-    localStorage.removeItem("userZipCode")
-    localStorage.removeItem("hospitalName")
-    localStorage.removeItem("isLoggedIn")
-
+    setUser({ id: "", email: "", type: null })
+    localStorage.removeItem("mediconnect-user")
     router.push("/login")
   }
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn, login, logout }}>{!isLoading && children}</AuthContext.Provider>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        logout,
+        isAuthenticated: !!user.type,
+        isLoading,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
   )
 }
+
+export const useAuth = () => useContext(AuthContext)

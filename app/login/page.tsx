@@ -3,10 +3,13 @@
 import type React from "react"
 
 import { useState } from "react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/components/auth-provider"
 import { Eye, EyeOff, Hospital, User } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -14,296 +17,246 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/hooks/use-toast"
 
 export default function LoginPage() {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [rememberMe, setRememberMe] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState("patient")
+  const { login } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
-  const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
 
-  // Patient login state
-  const [patientEmail, setPatientEmail] = useState("")
-  const [patientPassword, setPatientPassword] = useState("")
-  const [patientRemember, setPatientRemember] = useState(false)
-  const [patientError, setPatientError] = useState("")
-
-  // Hospital login state
-  const [hospitalEmail, setHospitalEmail] = useState("")
-  const [hospitalPassword, setHospitalPassword] = useState("")
-  const [hospitalRemember, setHospitalRemember] = useState(false)
-  const [hospitalError, setHospitalError] = useState("")
-
-  // Hardcoded credentials
-  const patientCredentials = [
-    { email: "patient1@email.com", password: "password123", zipCode: "12345" },
-    { email: "patient2@email.com", password: "patient2024", zipCode: "12345" },
-    { email: "patient3@email.com", password: "secure789", zipCode: "23456" },
-  ]
-
-  const hospitalCredentials = [
-    { email: "hospital1@med.com", password: "hospital2024", name: "Memorial General Hospital", zipCode: "12345" },
-    { email: "hospital2@med.com", password: "staffaccess", name: "University Medical Center", zipCode: "12345" },
-    { email: "hospital3@med.com", password: "12345678", name: "Riverside Community Hospital", zipCode: "23456" },
-  ]
-
-  const handlePatientLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setPatientError("")
 
-    // Email validation
-    if (!patientEmail.includes("@") || !patientEmail.includes(".")) {
-      setPatientError("Please enter a valid email address")
-      setIsLoading(false)
-      return
-    }
+    try {
+      // Validate form
+      if (!email) {
+        toast({
+          title: "Email required",
+          description: "Please enter your email address.",
+          variant: "destructive",
+        })
+        setIsLoading(false)
+        return
+      }
 
-    // Password validation
-    if (patientPassword.length < 6) {
-      setPatientError("Password must be at least 6 characters")
-      setIsLoading(false)
-      return
-    }
+      if (!password) {
+        toast({
+          title: "Password required",
+          description: "Please enter your password.",
+          variant: "destructive",
+        })
+        setIsLoading(false)
+        return
+      }
 
-    // Check credentials
-    const user = patientCredentials.find((cred) => cred.email === patientEmail && cred.password === patientPassword)
+      // Attempt login
+      const success = await login(email, password, rememberMe)
 
-    setTimeout(() => {
-      if (user) {
-        // Store user info in localStorage
-        localStorage.setItem("userType", "patient")
-        localStorage.setItem("userEmail", user.email)
-        localStorage.setItem("userZipCode", user.zipCode)
-        localStorage.setItem("isLoggedIn", "true")
-
+      if (!success) {
+        toast({
+          title: "Login failed",
+          description: "Invalid email or password. Please try again.",
+          variant: "destructive",
+        })
+      } else {
         toast({
           title: "Login successful",
-          description: "Welcome to MediConnect Patient Portal",
+          description: "Welcome to MediConnect!",
         })
-
-        // Redirect to patient dashboard
-        router.push("/patient-portal")
-      } else {
-        setPatientError("Invalid email or password")
       }
+    } catch (error) {
+      toast({
+        title: "Login error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
       setIsLoading(false)
-    }, 1000)
-  }
-
-  const handleHospitalLogin = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setHospitalError("")
-
-    // Email validation
-    if (!hospitalEmail.includes("@") || !hospitalEmail.includes(".")) {
-      setHospitalError("Please enter a valid email address")
-      setIsLoading(false)
-      return
     }
-
-    // Password validation
-    if (hospitalPassword.length < 6) {
-      setHospitalError("Password must be at least 6 characters")
-      setIsLoading(false)
-      return
-    }
-
-    // Check credentials
-    const hospital = hospitalCredentials.find(
-      (cred) => cred.email === hospitalEmail && cred.password === hospitalPassword,
-    )
-
-    setTimeout(() => {
-      if (hospital) {
-        // Store hospital info in localStorage
-        localStorage.setItem("userType", "hospital")
-        localStorage.setItem("userEmail", hospital.email)
-        localStorage.setItem("hospitalName", hospital.name)
-        localStorage.setItem("userZipCode", hospital.zipCode)
-        localStorage.setItem("isLoggedIn", "true")
-
-        toast({
-          title: "Login successful",
-          description: `Welcome to MediConnect Hospital Portal, ${hospital.name}`,
-        })
-
-        // Redirect to hospital dashboard
-        router.push("/hospital-portal")
-      } else {
-        setHospitalError("Invalid email or password")
-      }
-      setIsLoading(false)
-    }, 1000)
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <div className="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center">
-              <Hospital className="h-6 w-6 text-white" />
-            </div>
+      <div className="w-full max-w-4xl grid md:grid-cols-2 gap-8 items-center">
+        <div className="hidden md:flex flex-col items-center justify-center space-y-6">
+          <div className="relative w-64 h-64">
+            <Image
+              src="/placeholder.svg?height=256&width=256"
+              alt="MediConnect Logo"
+              fill
+              className="object-contain"
+              priority
+            />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">MediConnect</h1>
-          <p className="text-gray-600 mt-1">Healthcare Supply Chain & Resource Management</p>
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-bold text-gray-900">MediConnect</h1>
+            <p className="text-gray-600 max-w-sm">
+              Connecting healthcare resources with those who need them most. Streamlining supply chains for better
+              patient outcomes.
+            </p>
+          </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <Tabs defaultValue="patient" className="w-full">
-            <TabsList className="grid grid-cols-2 w-full">
-              <TabsTrigger value="patient" className="py-3">
-                <User className="mr-2 h-4 w-4" />
-                Patient
-              </TabsTrigger>
-              <TabsTrigger value="hospital" className="py-3">
-                <Hospital className="mr-2 h-4 w-4" />
-                Hospital/Staff
-              </TabsTrigger>
-            </TabsList>
+        <Card className="w-full shadow-lg border-blue-100">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold text-center">Sign in to MediConnect</CardTitle>
+            <CardDescription className="text-center">Choose your account type to continue</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="patient" className="w-full" onValueChange={setActiveTab}>
+              <TabsList className="grid grid-cols-2 mb-6">
+                <TabsTrigger value="patient" className="data-[state=active]:bg-blue-50">
+                  <User className="mr-2 h-4 w-4" />
+                  Patient Portal
+                </TabsTrigger>
+                <TabsTrigger value="hospital" className="data-[state=active]:bg-blue-50">
+                  <Hospital className="mr-2 h-4 w-4" />
+                  Hospital Portal
+                </TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="patient" className="p-6">
-              <form onSubmit={handlePatientLogin}>
-                <div className="space-y-4">
+              <TabsContent value="patient">
+                <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="patient-email">Email</Label>
                     <Input
                       id="patient-email"
                       type="email"
                       placeholder="patient@example.com"
-                      value={patientEmail}
-                      onChange={(e) => setPatientEmail(e.target.value)}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={isLoading}
                       required
                     />
                   </div>
-
                   <div className="space-y-2">
-                    <div className="flex justify-between">
+                    <div className="flex items-center justify-between">
                       <Label htmlFor="patient-password">Password</Label>
-                      <a href="#" className="text-sm text-blue-600 hover:text-blue-800">
+                      <Button variant="link" className="p-0 h-auto text-xs" type="button">
                         Forgot password?
-                      </a>
+                      </Button>
                     </div>
                     <div className="relative">
                       <Input
                         id="patient-password"
                         type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
-                        value={patientPassword}
-                        onChange={(e) => setPatientPassword(e.target.value)}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
                         required
                       />
-                      <button
+                      <Button
                         type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                      </button>
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
+                      </Button>
                     </div>
                   </div>
-
-                  {patientError && <div className="text-red-500 text-sm">{patientError}</div>}
-
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="patient-remember"
-                      checked={patientRemember}
-                      onCheckedChange={(checked) => setPatientRemember(checked as boolean)}
+                      checked={rememberMe}
+                      onCheckedChange={(checked) => setRememberMe(checked === true)}
                     />
-                    <label
-                      htmlFor="patient-remember"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
+                    <Label htmlFor="patient-remember" className="text-sm">
                       Remember me
-                    </label>
+                    </Label>
                   </div>
-
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Logging in..." : "Login to Patient Portal"}
+                    {isLoading ? "Signing in..." : "Sign in"}
                   </Button>
-
-                  <div className="text-center text-sm text-gray-500 mt-4">
-                    <p>Demo credentials:</p>
-                    <p className="font-mono text-xs mt-1">patient1@email.com / password123</p>
-                  </div>
+                </form>
+                <div className="mt-4 text-center text-sm text-muted-foreground">
+                  <p>Patient demo accounts:</p>
+                  <p className="font-mono text-xs mt-1">patient1@email.com / password123</p>
+                  <p className="font-mono text-xs">patient2@email.com / patient2024</p>
                 </div>
-              </form>
-            </TabsContent>
+              </TabsContent>
 
-            <TabsContent value="hospital" className="p-6">
-              <form onSubmit={handleHospitalLogin}>
-                <div className="space-y-4">
+              <TabsContent value="hospital">
+                <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="hospital-email">Email</Label>
                     <Input
                       id="hospital-email"
                       type="email"
-                      placeholder="hospital@med.com"
-                      value={hospitalEmail}
-                      onChange={(e) => setHospitalEmail(e.target.value)}
+                      placeholder="hospital@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={isLoading}
                       required
                     />
                   </div>
-
                   <div className="space-y-2">
-                    <div className="flex justify-between">
+                    <div className="flex items-center justify-between">
                       <Label htmlFor="hospital-password">Password</Label>
-                      <a href="#" className="text-sm text-blue-600 hover:text-blue-800">
+                      <Button variant="link" className="p-0 h-auto text-xs" type="button">
                         Forgot password?
-                      </a>
+                      </Button>
                     </div>
                     <div className="relative">
                       <Input
                         id="hospital-password"
                         type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
-                        value={hospitalPassword}
-                        onChange={(e) => setHospitalPassword(e.target.value)}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
                         required
                       />
-                      <button
+                      <Button
                         type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                      </button>
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
+                      </Button>
                     </div>
                   </div>
-
-                  {hospitalError && <div className="text-red-500 text-sm">{hospitalError}</div>}
-
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="hospital-remember"
-                      checked={hospitalRemember}
-                      onCheckedChange={(checked) => setHospitalRemember(checked as boolean)}
+                      checked={rememberMe}
+                      onCheckedChange={(checked) => setRememberMe(checked === true)}
                     />
-                    <label
-                      htmlFor="hospital-remember"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
+                    <Label htmlFor="hospital-remember" className="text-sm">
                       Remember me
-                    </label>
+                    </Label>
                   </div>
-
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Logging in..." : "Login to Hospital Portal"}
+                    {isLoading ? "Signing in..." : "Sign in"}
                   </Button>
-
-                  <div className="text-center text-sm text-gray-500 mt-4">
-                    <p>Demo credentials:</p>
-                    <p className="font-mono text-xs mt-1">hospital1@med.com / hospital2024</p>
-                  </div>
+                </form>
+                <div className="mt-4 text-center text-sm text-muted-foreground">
+                  <p>Hospital demo accounts:</p>
+                  <p className="font-mono text-xs mt-1">hospital1@med.com / hospital2024</p>
+                  <p className="font-mono text-xs">hospital2@med.com / staffaccess</p>
                 </div>
-              </form>
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        <div className="text-center mt-6 text-sm text-gray-500">
-          <p>© {new Date().getFullYear()} MediConnect. All rights reserved.</p>
-        </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4">
+            <div className="text-center text-sm text-muted-foreground">
+              <span>Don't have an account? </span>
+              <Button variant="link" className="p-0 h-auto" type="button">
+                Register
+              </Button>
+            </div>
+          </CardFooter>
+        </Card>
       </div>
     </div>
   )
