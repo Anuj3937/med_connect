@@ -1,144 +1,117 @@
 "use client"
-
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/components/auth-provider"
-import {
-  BarChart3,
-  Calendar,
-  ClipboardList,
-  LayoutDashboard,
-  Map,
-  Package,
-  Pill,
-  ShoppingCart,
-  Truck,
-  Users,
-  Bell,
-  Activity,
-} from "lucide-react"
 
-interface MainNavProps {
-  className?: string
-}
-
-export function MainNav({ className }: MainNavProps) {
+export function MainNav() {
   const pathname = usePathname()
   const { user } = useAuth()
 
-  // Define navigation items based on user type
+  // Determine which portal we're in
+  const isPatientPortal = pathname.includes("/patient-portal")
+  const isHospitalPortal = pathname.includes("/hospital-portal")
+
+  // Patient portal navigation items
   const patientNavItems = [
     {
       title: "Dashboard",
       href: "/patient-portal",
-      icon: <LayoutDashboard className="mr-2 h-4 w-4" />,
+      active: pathname === "/patient-portal",
     },
     {
       title: "Appointments",
       href: "/patient-portal/appointments",
-      icon: <Calendar className="mr-2 h-4 w-4" />,
+      active: pathname === "/patient-portal/appointments",
+    },
+    {
+      title: "Hospitals",
+      href: "/patient-portal/hospitals",
+      active: pathname === "/patient-portal/hospitals",
     },
     {
       title: "Medications",
       href: "/patient-portal/medications",
-      icon: <Pill className="mr-2 h-4 w-4" />,
+      active: pathname === "/patient-portal/medications",
     },
     {
       title: "Health Records",
       href: "/patient-portal/records",
-      icon: <ClipboardList className="mr-2 h-4 w-4" />,
-    },
-    {
-      title: "Find Hospitals",
-      href: "/patient-portal/hospitals",
-      icon: <Map className="mr-2 h-4 w-4" />,
-    },
-    {
-      title: "Health Tracking",
-      href: "/patient-portal/tracking",
-      icon: <Activity className="mr-2 h-4 w-4" />,
-    },
-    {
-      title: "Notifications",
-      href: "/patient-portal/notifications",
-      icon: <Bell className="mr-2 h-4 w-4" />,
+      active: pathname === "/patient-portal/records",
     },
   ]
 
+  // Hospital portal navigation items
   const hospitalNavItems = [
     {
       title: "Dashboard",
       href: "/hospital-portal",
-      icon: <LayoutDashboard className="mr-2 h-4 w-4" />,
+      active: pathname === "/hospital-portal",
     },
     {
       title: "Inventory",
       href: "/hospital-portal/inventory",
-      icon: <Package className="mr-2 h-4 w-4" />,
+      active: pathname === "/hospital-portal/inventory",
     },
     {
       title: "Supply Chain",
       href: "/hospital-portal/supply-chain",
-      icon: <Truck className="mr-2 h-4 w-4" />,
+      active: pathname === "/hospital-portal/supply-chain",
     },
     {
       title: "Resource Allocation",
-      href: "/hospital-portal/resources",
-      icon: <BarChart3 className="mr-2 h-4 w-4" />,
+      href: "/hospital-portal/resource-allocation",
+      active: pathname === "/hospital-portal/resource-allocation",
     },
     {
       title: "Demand Forecast",
-      href: "/hospital-portal/forecast",
-      icon: <BarChart3 className="mr-2 h-4 w-4" />,
+      href: "/hospital-portal/demand-forecast",
+      active: pathname === "/hospital-portal/demand-forecast",
     },
     {
       title: "Patients",
       href: "/hospital-portal/patients",
-      icon: <Users className="mr-2 h-4 w-4" />,
-    },
-    {
-      title: "Orders",
-      href: "/hospital-portal/orders",
-      icon: <ShoppingCart className="mr-2 h-4 w-4" />,
-    },
-    {
-      title: "Staff Management",
-      href: "/hospital-portal/staff",
-      icon: <Users className="mr-2 h-4 w-4" />,
-    },
-    {
-      title: "Analytics",
-      href: "/hospital-portal/analytics",
-      icon: <Activity className="mr-2 h-4 w-4" />,
+      active: pathname === "/hospital-portal/patients",
     },
   ]
 
-  // Select the appropriate navigation items based on user type
-  const navItems = user.type === "patient" ? patientNavItems : hospitalNavItems
+  // Determine which nav items to show
+  const navItems = isPatientPortal
+    ? patientNavItems
+    : isHospitalPortal
+      ? hospitalNavItems
+      : [
+          {
+            title: "Home",
+            href: "/",
+            active: pathname === "/",
+          },
+          {
+            title: "Patient Portal",
+            href: "/patient-portal",
+            active: pathname === "/patient-portal",
+          },
+          {
+            title: "Hospital Portal",
+            href: "/hospital-portal",
+            active: pathname === "/hospital-portal",
+          },
+        ]
 
   return (
-    <nav className={cn("flex items-center space-x-4 lg:space-x-6", className)}>
-      {navItems.map((item) => {
-        const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex items-center text-sm font-medium transition-colors hover:text-primary relative group",
-              isActive ? "text-primary" : "text-muted-foreground",
-            )}
-          >
-            <span className={cn("flex items-center", isActive && "font-semibold")}>
-              {item.icon}
-              {item.title}
-            </span>
-            {isActive && <span className="absolute -bottom-2 left-0 right-0 h-0.5 bg-primary rounded-full" />}
-            <span className="absolute -bottom-2 left-0 right-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform rounded-full" />
-          </Link>
-        )
-      })}
+    <nav className="flex items-center space-x-4 lg:space-x-6 overflow-x-auto">
+      {navItems.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={cn(
+            "text-sm font-medium transition-colors hover:text-primary whitespace-nowrap",
+            item.active ? "text-primary" : "text-muted-foreground",
+          )}
+        >
+          {item.title}
+        </Link>
+      ))}
     </nav>
   )
 }

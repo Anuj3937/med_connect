@@ -1,28 +1,50 @@
 "use client"
 
 import { useState } from "react"
-import { Search, Filter, Phone, Clock, Star, ArrowRight } from "lucide-react"
+import { Search, Filter, Clock, Star, ArrowRight, Navigation } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { PatientNearbyHospitals } from "@/components/patient/patient-nearby-hospitals"
 import { PatientHospitalMap } from "@/components/patient/patient-hospital-map"
 import { useAuth } from "@/components/auth-provider"
+import { useToast } from "@/hooks/use-toast"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Slider } from "@/components/ui/slider"
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 
 export default function HospitalsPage() {
   const { user } = useAuth()
+  const { toast } = useToast()
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedHospital, setSelectedHospital] = useState<string | null>(null)
-  const [mapView, setMapView] = useState(false)
+  const [mapView, setMapView] = useState(true)
+  const [distance, setDistance] = useState([5])
+  const [filterType, setFilterType] = useState<string>("all")
+
+  const handleScheduleAppointment = () => {
+    toast({
+      title: "Appointment scheduled",
+      description: "Your appointment has been scheduled successfully.",
+    })
+  }
+
+  const handleGetDirections = () => {
+    toast({
+      title: "Directions loaded",
+      description: "Turn-by-turn directions to your destination are ready.",
+    })
+  }
 
   return (
     <div className="container py-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Find Hospitals & Care Centers</h1>
-        <p className="text-muted-foreground">Locate hospitals, clinics, and specialized care centers near you</p>
+        <p className="text-muted-foreground">Locate hospitals, clinics, pharmacies, and equipment providers near you</p>
       </div>
 
       <div className="flex flex-col md:flex-row gap-6">
@@ -51,48 +73,86 @@ export default function HospitalsPage() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
-                <Button variant="outline">
-                  <Filter className="mr-2 h-4 w-4" />
-                  Filter
-                </Button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline">
+                      <Filter className="mr-2 h-4 w-4" />
+                      Filter
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80">
+                    <div className="grid gap-4">
+                      <div className="space-y-2">
+                        <h4 className="font-medium leading-none">Filter Options</h4>
+                        <p className="text-sm text-muted-foreground">Refine your search results</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Distance (miles)</Label>
+                        <Slider defaultValue={[5]} max={20} step={1} value={distance} onValueChange={setDistance} />
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>0 mi</span>
+                          <span>{distance[0]} mi</span>
+                          <span>20 mi</span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Facility Type</Label>
+                        <Select value={filterType} onValueChange={setFilterType}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Facilities</SelectItem>
+                            <SelectItem value="hospitals">Hospitals Only</SelectItem>
+                            <SelectItem value="pharmacies">Pharmacies Only</SelectItem>
+                            <SelectItem value="equipment">Equipment Providers</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Services</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox id="emergency" />
+                            <label htmlFor="emergency" className="text-sm">
+                              Emergency Care
+                            </label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox id="pediatric" />
+                            <label htmlFor="pediatric" className="text-sm">
+                              Pediatric
+                            </label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox id="cardiology" />
+                            <label htmlFor="cardiology" className="text-sm">
+                              Cardiology
+                            </label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox id="orthopedics" />
+                            <label htmlFor="orthopedics" className="text-sm">
+                              Orthopedics
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button className="w-full">Apply Filters</Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
 
-              <Tabs defaultValue="all">
-                <TabsList className="mb-4">
-                  <TabsTrigger value="all">All</TabsTrigger>
-                  <TabsTrigger value="hospitals">Hospitals</TabsTrigger>
-                  <TabsTrigger value="clinics">Clinics</TabsTrigger>
-                  <TabsTrigger value="specialty">Specialty Centers</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="all">
-                  <PatientNearbyHospitals onSelectHospital={setSelectedHospital} selectedHospital={selectedHospital} />
-                </TabsContent>
-
-                <TabsContent value="hospitals">
-                  <PatientNearbyHospitals
-                    filterType="hospital"
-                    onSelectHospital={setSelectedHospital}
-                    selectedHospital={selectedHospital}
-                  />
-                </TabsContent>
-
-                <TabsContent value="clinics">
-                  <PatientNearbyHospitals
-                    filterType="clinic"
-                    onSelectHospital={setSelectedHospital}
-                    selectedHospital={selectedHospital}
-                  />
-                </TabsContent>
-
-                <TabsContent value="specialty">
-                  <PatientNearbyHospitals
-                    filterType="specialty"
-                    onSelectHospital={setSelectedHospital}
-                    selectedHospital={selectedHospital}
-                  />
-                </TabsContent>
-              </Tabs>
+              <PatientNearbyHospitals
+                filterType={filterType === "all" ? undefined : filterType}
+                onSelectHospital={setSelectedHospital}
+                selectedHospital={selectedHospital}
+              />
             </CardContent>
           </Card>
         </div>
@@ -100,8 +160,8 @@ export default function HospitalsPage() {
         <div className={mapView ? "w-full md:w-2/3" : "w-full md:w-1/2"}>
           <Card className="h-full">
             <CardHeader>
-              <CardTitle>Hospital Map</CardTitle>
-              <CardDescription>Interactive map of healthcare facilities</CardDescription>
+              <CardTitle>Healthcare Facilities Map</CardTitle>
+              <CardDescription>Interactive map with OpenStreetMap integration</CardDescription>
             </CardHeader>
             <CardContent className="p-0 h-[600px]">
               <PatientHospitalMap selectedHospital={selectedHospital} onSelectHospital={setSelectedHospital} />
@@ -130,10 +190,10 @@ export default function HospitalsPage() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button>Schedule Appointment</Button>
-                <Button variant="outline">
-                  <Phone className="mr-2 h-4 w-4" />
-                  Call
+                <Button onClick={handleScheduleAppointment}>Schedule Appointment</Button>
+                <Button variant="outline" onClick={handleGetDirections}>
+                  <Navigation className="mr-2 h-4 w-4" />
+                  Directions
                 </Button>
               </div>
             </div>
