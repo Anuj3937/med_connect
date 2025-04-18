@@ -1,13 +1,26 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
-import { ArrowUpDown, MoreHorizontal, Package, Search } from "lucide-react"
+import { ArrowUpDown, MoreHorizontal, Search, Plus, Download, Filter } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
 import { Progress } from "@/components/ui/progress"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface HospitalInventorySummaryProps {
   filterStatus?: "critical" | "low" | "normal"
@@ -26,6 +39,9 @@ export function HospitalInventorySummary({
   const [searchTerm, setSearchTerm] = useState("")
   const [sortColumn, setSortColumn] = useState<"name" | "category" | "quantity" | "status">("status")
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
+  const [showAddDialog, setShowAddDialog] = useState(false)
+  const [showOrderDialog, setShowOrderDialog] = useState(false)
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
 
   const [inventory, setInventory] = useState([
     {
@@ -44,6 +60,7 @@ export function HospitalInventorySummary({
       id: "inv-2",
       name: "Surgical Masks",
       category: "PPE",
+
       quantity: 1200,
       threshold: 500,
       unit: "pieces",
@@ -150,11 +167,50 @@ export function HospitalInventorySummary({
     },
   ])
 
+  const handleAddItem = (event: React.FormEvent) => {
+    event.preventDefault()
+
+    // In a real app, we would get the form data and add the item
+    // For now, let's just add a dummy item
+    const newItem = {
+      id: `inv-${inventory.length + 1}`,
+      name: "New Medical Supply",
+      category: "Supplies",
+      quantity: 50,
+      threshold: 20,
+      unit: "pieces",
+      location: "Storage Room A",
+      expiryDate: "2026-01-01",
+      status: "normal",
+      delayed: false,
+    }
+
+    setInventory([...inventory, newItem])
+    setShowAddDialog(false)
+
+    toast({
+      title: "Item added",
+      description: "New inventory item has been added successfully.",
+    })
+  }
+
   const handleOrderMore = (id: string) => {
+    setSelectedItemId(id)
+    setShowOrderDialog(true)
+  }
+
+  const submitOrder = (event: React.FormEvent) => {
+    event.preventDefault()
+
+    // In a real app, we would submit the order
+    // For now, let's just show a toast
     toast({
       title: "Order placed",
       description: "Your order has been placed successfully.",
     })
+
+    setShowOrderDialog(false)
+    setSelectedItemId(null)
   }
 
   const handleSort = (column: "name" | "category" | "quantity" | "status") => {
@@ -238,10 +294,98 @@ export function HospitalInventorySummary({
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button>
-            <Package className="mr-2 h-4 w-4" />
-            Add New Item
-          </Button>
+          <div className="flex gap-2">
+            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Item
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <form onSubmit={handleAddItem}>
+                  <DialogHeader>
+                    <DialogTitle>Add New Inventory Item</DialogTitle>
+                    <DialogDescription>Enter the details of the new inventory item.</DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="item-name">Item Name</Label>
+                      <Input id="item-name" placeholder="e.g., IV Solution (Normal Saline)" required />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="category">Category</Label>
+                        <Select defaultValue="supplies">
+                          <SelectTrigger id="category">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="medication">Medication</SelectItem>
+                            <SelectItem value="supplies">Supplies</SelectItem>
+                            <SelectItem value="equipment">Equipment</SelectItem>
+                            <SelectItem value="ppe">PPE</SelectItem>
+                            <SelectItem value="fluids">IV Fluids</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="location">Storage Location</Label>
+                        <Select defaultValue="storage-a">
+                          <SelectTrigger id="location">
+                            <SelectValue placeholder="Select location" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pharmacy">Pharmacy</SelectItem>
+                            <SelectItem value="storage-a">Storage Room A</SelectItem>
+                            <SelectItem value="storage-b">Storage Room B</SelectItem>
+                            <SelectItem value="icu">ICU Storage</SelectItem>
+                            <SelectItem value="er">ER Storage</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="quantity">Quantity</Label>
+                        <Input id="quantity" type="number" min="0" defaultValue="50" required />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="unit">Unit</Label>
+                        <Input id="unit" placeholder="e.g., bags, vials, pieces" defaultValue="pieces" required />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="threshold">Minimum Threshold</Label>
+                        <Input id="threshold" type="number" min="0" defaultValue="20" required />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="expiry">Expiry Date</Label>
+                        <Input id="expiry" type="date" defaultValue="2026-01-01" />
+                      </div>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="button" variant="outline" onClick={() => setShowAddDialog(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit">Add Item</Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+
+            <Button variant="outline">
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
+
+            <Button variant="outline">
+              <Filter className="mr-2 h-4 w-4" />
+              Filter
+            </Button>
+          </div>
         </div>
       )}
 
@@ -358,6 +502,50 @@ export function HospitalInventorySummary({
           Showing {filteredInventory.length} of {inventory.length} items
         </div>
       )}
+
+      {/* Order More Dialog */}
+      <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <form onSubmit={submitOrder}>
+            <DialogHeader>
+              <DialogTitle>Order Inventory</DialogTitle>
+              <DialogDescription>
+                Place an order for {inventory.find((item) => item.id === selectedItemId)?.name}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="order-quantity">Order Quantity</Label>
+                <Input id="order-quantity" type="number" min="1" defaultValue="100" required />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="priority">Priority</Label>
+                <Select defaultValue="normal">
+                  <SelectTrigger id="priority">
+                    <SelectValue placeholder="Select priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="normal">Normal</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="notes">Notes</Label>
+                <Input id="notes" placeholder="Any special instructions for this order" />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setShowOrderDialog(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Place Order</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

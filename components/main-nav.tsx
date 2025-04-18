@@ -25,6 +25,11 @@ export function MainNav() {
       active: pathname === "/patient-portal/appointments",
     },
     {
+      title: "Telemedicine",
+      href: "/patient-portal/telemedicine",
+      active: pathname === "/patient-portal/telemedicine",
+    },
+    {
       title: "Hospitals",
       href: "/patient-portal/hospitals",
       active: pathname === "/patient-portal/hospitals",
@@ -38,6 +43,31 @@ export function MainNav() {
       title: "Health Records",
       href: "/patient-portal/records",
       active: pathname === "/patient-portal/records",
+    },
+    {
+      title: "Find Doctors",
+      href: "/patient-portal/find-doctors",
+      active: pathname === "/patient-portal/find-doctors",
+    },
+    {
+      title: "Find Medicines",
+      href: "/patient-portal/find-medicines",
+      active: pathname === "/patient-portal/find-medicines",
+    },
+    {
+      title: "Find Equipment",
+      href: "/patient-portal/find-equipment",
+      active: pathname === "/patient-portal/find-equipment",
+    },
+    {
+      title: "Lab Results",
+      href: "/patient-portal/lab-results",
+      active: pathname === "/patient-portal/lab-results",
+    },
+    {
+      title: "Insurance",
+      href: "/patient-portal/insurance",
+      active: pathname === "/patient-portal/insurance",
     },
   ]
 
@@ -67,6 +97,11 @@ export function MainNav() {
       title: "Demand Forecast",
       href: "/hospital-portal/demand-forecast",
       active: pathname === "/hospital-portal/demand-forecast",
+    },
+    {
+      title: "Telemedicine",
+      href: "/hospital-portal/telemedicine",
+      active: pathname === "/hospital-portal/telemedicine",
     },
     {
       title: "Patients",

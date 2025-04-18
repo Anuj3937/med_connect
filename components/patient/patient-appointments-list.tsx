@@ -6,6 +6,16 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 export function PatientAppointmentsList() {
   const { toast } = useToast()
@@ -38,20 +48,44 @@ export function PatientAppointmentsList() {
       status: "pending",
     },
   ])
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [appointmentToCancel, setAppointmentToCancel] = useState<string | null>(null)
+  const [rescheduleDialogOpen, setRescheduleDialogOpen] = useState(false)
+  const [appointmentToReschedule, setAppointmentToReschedule] = useState<string | null>(null)
 
-  const handleCancelAppointment = (id: string) => {
-    setAppointments(appointments.filter((apt) => apt.id !== id))
-    toast({
-      title: "Appointment cancelled",
-      description: "Your appointment has been cancelled successfully.",
-    })
+  const handleCancelAppointment = () => {
+    if (appointmentToCancel) {
+      setAppointments(appointments.filter((apt) => apt.id !== appointmentToCancel))
+      toast({
+        title: "Appointment cancelled",
+        description: "Your appointment has been cancelled successfully.",
+      })
+      setCancelDialogOpen(false)
+      setAppointmentToCancel(null)
+    }
   }
 
-  const handleRescheduleAppointment = (id: string) => {
-    toast({
-      title: "Reschedule requested",
-      description: "A request to reschedule your appointment has been sent.",
-    })
+  const openCancelDialog = (id: string) => {
+    setAppointmentToCancel(id)
+    setCancelDialogOpen(true)
+  }
+
+  const handleRescheduleAppointment = () => {
+    if (appointmentToReschedule) {
+      // In a real app, this would open a rescheduling form
+      // For now, we'll just show a toast
+      toast({
+        title: "Reschedule requested",
+        description: "A request to reschedule your appointment has been sent.",
+      })
+      setRescheduleDialogOpen(false)
+      setAppointmentToReschedule(null)
+    }
+  }
+
+  const openRescheduleDialog = (id: string) => {
+    setAppointmentToReschedule(id)
+    setRescheduleDialogOpen(true)
   }
 
   const getStatusBadge = (status: string) => {
@@ -82,7 +116,7 @@ export function PatientAppointmentsList() {
   return (
     <div className="space-y-4">
       {appointments.map((appointment) => (
-        <div key={appointment.id} className="rounded-lg border p-4">
+        <div key={appointment.id} className="rounded-lg border p-4 hover:shadow-sm transition-shadow">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
@@ -116,10 +150,8 @@ export function PatientAppointmentsList() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleRescheduleAppointment(appointment.id)}>
-                    Reschedule
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleCancelAppointment(appointment.id)} className="text-red-600">
+                  <DropdownMenuItem onClick={() => openRescheduleDialog(appointment.id)}>Reschedule</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => openCancelDialog(appointment.id)} className="text-red-600">
                     Cancel
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -135,6 +167,42 @@ export function PatientAppointmentsList() {
           <Button className="mt-4">Schedule an Appointment</Button>
         </div>
       )}
+
+      {/* Cancel Confirmation Dialog */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel Appointment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to cancel this appointment? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>No, keep appointment</AlertDialogCancel>
+            <AlertDialogAction onClick={handleCancelAppointment} className="bg-red-600 hover:bg-red-700">
+              Yes, cancel appointment
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reschedule Confirmation Dialog */}
+      <AlertDialog open={rescheduleDialogOpen} onOpenChange={setRescheduleDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reschedule Appointment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Would you like to request rescheduling this appointment? Our staff will contact you to confirm a new time.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleRescheduleAppointment} className="bg-blue-600 hover:bg-blue-700">
+              Request Reschedule
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

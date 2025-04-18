@@ -30,7 +30,7 @@ export function SdohDataTable() {
           <TableRow>
             <TableCell className="font-medium">Unemployment</TableCell>
             <TableCell>6.5%</TableCell>
-            <TableCell className="text-red-600 dark:text-red-400">↑ 1.2%</TableCell>
+            <TableCell className="text-red-600 dark:text-red-400">�� 1.2%</TableCell>
             <TableCell className="text-right">High</TableCell>
           </TableRow>
           <TableRow>
