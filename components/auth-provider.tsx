@@ -25,6 +25,7 @@ interface AuthContextType {
   logout: () => void
   isAuthenticated: boolean
   isLoading: boolean
+  isLoggedIn: boolean // Added the missing property
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -33,6 +34,7 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
   isAuthenticated: false,
   isLoading: true,
+  isLoggedIn: false // Added with default value
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -191,14 +193,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/login")
   }
 
+  const isAuthenticated = !!user.type
+  const isLoggedIn = !!user.type // Added this line to provide the isLoggedIn property
+
   return (
     <AuthContext.Provider
       value={{
         user,
         login,
         logout,
-        isAuthenticated: !!user.type,
+        isAuthenticated,
         isLoading,
+        isLoggedIn // Added this property to the context value
       }}
     >
       {children}
