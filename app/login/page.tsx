@@ -6,7 +6,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
-import { Eye, EyeOff, Hospital, User } from "lucide-react"
+import { Eye, EyeOff, Hospital, User, Pill, ShieldCheck } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/hooks/use-toast"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -23,7 +24,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("patient")
-  const { login } = useAuth()
+  const [selectedHospital, setSelectedHospital] = useState("")
+  const { login, hospitals } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
 
@@ -53,8 +55,19 @@ export default function LoginPage() {
         return
       }
 
+      // For pharmacy users, validate hospital selection if required
+      if (activeTab === "pharmacy" && !selectedHospital) {
+        toast({
+          title: "Hospital selection required",
+          description: "Please select the hospital you're associated with.",
+          variant: "destructive",
+        })
+        setIsLoading(false)
+        return
+      }
+
       // Attempt login
-      const success = await login(email, password, rememberMe)
+      const success = await login(email, password, rememberMe, selectedHospital || undefined)
 
       if (!success) {
         toast({
@@ -108,14 +121,22 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="patient" className="w-full" onValueChange={setActiveTab}>
-              <TabsList className="grid grid-cols-2 mb-6">
+              <TabsList className="grid grid-cols-4 mb-6">
                 <TabsTrigger value="patient" className="data-[state=active]:bg-blue-50">
                   <User className="mr-2 h-4 w-4" />
-                  Patient Portal
+                  Patient
                 </TabsTrigger>
                 <TabsTrigger value="hospital" className="data-[state=active]:bg-blue-50">
                   <Hospital className="mr-2 h-4 w-4" />
-                  Hospital Portal
+                  Hospital
+                </TabsTrigger>
+                <TabsTrigger value="pharmacy" className="data-[state=active]:bg-blue-50">
+                  <Pill className="mr-2 h-4 w-4" />
+                  Pharmacy
+                </TabsTrigger>
+                <TabsTrigger value="admin" className="data-[state=active]:bg-blue-50">
+                  <ShieldCheck className="mr-2 h-4 w-4" />
+                  Admin
                 </TabsTrigger>
               </TabsList>
 
@@ -244,6 +265,151 @@ export default function LoginPage() {
                   <p>Hospital demo accounts:</p>
                   <p className="font-mono text-xs mt-1">hospital1@med.com / hospital2024</p>
                   <p className="font-mono text-xs">hospital2@med.com / staffaccess</p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="pharmacy">
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="pharmacy-email">Email</Label>
+                    <Input
+                      id="pharmacy-email"
+                      type="email"
+                      placeholder="pharmacy@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={isLoading}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="pharmacy-password">Password</Label>
+                      <Button variant="link" className="p-0 h-auto text-xs" type="button">
+                        Forgot password?
+                      </Button>
+                    </div>
+                    <div className="relative">
+                      <Input
+                        id="pharmacy-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="pharmacy-hospital">Associated Hospital</Label>
+                    <Select value={selectedHospital} onValueChange={setSelectedHospital}>
+                      <SelectTrigger id="pharmacy-hospital">
+                        <SelectValue placeholder="Select a hospital" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {hospitals.map((hospital) => (
+                          <SelectItem key={hospital.id} value={hospital.id}>
+                            {hospital.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Select the hospital you're associated with for this session
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="pharmacy-remember"
+                      checked={rememberMe}
+                      onCheckedChange={(checked) => setRememberMe(checked === true)}
+                    />
+                    <Label htmlFor="pharmacy-remember" className="text-sm">
+                      Remember me
+                    </Label>
+                  </div>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Signing in..." : "Sign in"}
+                  </Button>
+                </form>
+                <div className="mt-4 text-center text-sm text-muted-foreground">
+                  <p>Pharmacy demo accounts:</p>
+                  <p className="font-mono text-xs mt-1">pharmacy1@med.com / pharmacy2024</p>
+                  <p className="font-mono text-xs">pharmacy2@med.com / rxaccess</p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="admin">
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="admin-email">Email</Label>
+                    <Input
+                      id="admin-email"
+                      type="email"
+                      placeholder="admin@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={isLoading}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="admin-password">Password</Label>
+                      <Button variant="link" className="p-0 h-auto text-xs" type="button">
+                        Forgot password?
+                      </Button>
+                    </div>
+                    <div className="relative">
+                      <Input
+                        id="admin-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="admin-remember"
+                      checked={rememberMe}
+                      onCheckedChange={(checked) => setRememberMe(checked === true)}
+                    />
+                    <Label htmlFor="admin-remember" className="text-sm">
+                      Remember me
+                    </Label>
+                  </div>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Signing in..." : "Sign in"}
+                  </Button>
+                </form>
+                <div className="mt-4 text-center text-sm text-muted-foreground">
+                  <p>Admin demo account:</p>
+                  <p className="font-mono text-xs mt-1">admin@mediconnect.com / admin2024</p>
                 </div>
               </TabsContent>
             </Tabs>
