@@ -7,8 +7,8 @@ from scipy import stats
 # Set random seed for reproducibility
 np.random.seed(42)
 
-# Define sample size
-n_samples = 50000
+# Define larger sample size
+n_samples = 200000  # Increased from 50,000 to 200,000
 
 # Create date range covering multiple years to capture seasonal patterns
 start_date = datetime(2022, 1, 1)
@@ -20,8 +20,6 @@ random_dates.sort()  # Sort dates for time series analysis
 print("Generating Mumbai healthcare synthetic dataset...")
 
 # Generate demographic data based on Mumbai's population statistics
-# Mumbai's 2025 population is estimated at 22,089,000 according to search result [1]
-
 # Age distribution
 age_distribution = np.concatenate([
     np.random.normal(5, 3, size=int(n_samples*0.1)),    # Children (10%)
@@ -55,7 +53,7 @@ for area in area_distribution:
     else:  # Thane
         pin_codes.append(np.random.randint(400600, 400612))
 
-# Slum dwelling indicator - approximately 40% of Mumbai's population lives in slums [7]
+# Slum dwelling indicator - approximately 40% of Mumbai's population lives in slums
 is_slum_dwelling = []
 for area in area_distribution:
     if area == 'South Mumbai':
@@ -83,7 +81,7 @@ for i, area in enumerate(area_distribution):
     else:  # Thane
         ses.append(np.random.choice(ses_categories, p=[0.2, 0.25, 0.3, 0.15, 0.1]))
 
-# Generate insurance status - 73% of surveyed households did not have health insurance [7]
+# Generate insurance status - 73% of surveyed households did not have health insurance
 insurance_types = ['Private', 'Government', 'Employer', 'None']
 # Insurance distribution correlates with SES
 insurance = []
@@ -120,7 +118,7 @@ humidity = []
 for i, date in enumerate(random_dates):
     month = date.month
     
-    # Temperature patterns based on Mumbai's climate data [19]
+    # Temperature patterns based on Mumbai's climate data
     if month == 1:  # January
         temp = np.random.normal(23.9, 3.3)
     elif month == 2:  # February
@@ -148,7 +146,7 @@ for i, date in enumerate(random_dates):
     
     temperature.append(temp)
     
-    # Precipitation patterns based on Mumbai's monsoon [9]
+    # Precipitation patterns based on Mumbai's monsoon
     if month in [6, 7, 8, 9]:  # Monsoon season (June-September)
         if month == 7:  # July is wettest
             daily_precip_chance = 0.8
@@ -181,7 +179,7 @@ for i, date in enumerate(random_dates):
         else:
             precipitation.append(0)
     
-    # Humidity patterns based on Mumbai's climate [18]
+    # Humidity patterns based on Mumbai's climate
     if month == 1:  # January
         humidity.append(np.random.normal(62, 5))
     elif month == 2:  # February
@@ -246,7 +244,7 @@ for i, date in enumerate(random_dates):
     pollen_count.append(min(base_pollen, 200))  # Cap extreme values
 
 # Generate cyclone/extreme weather event indicator for Mumbai
-# Mumbai cyclone risk is highest in May-June (pre-monsoon) and October-November (post-monsoon) [11]
+# Mumbai cyclone risk is highest in May-June (pre-monsoon) and October-November (post-monsoon)
 is_cyclone_risk = []
 for date in random_dates:
     month = date.month
@@ -274,11 +272,11 @@ for date in random_dates:
         is_vector_disease_risk.append(np.random.binomial(1, 0.03))  # 3% chance other times
 
 # Generate comorbidity data based on Mumbai's health statistics
-# 60% of Mumbaikars struggle with weight issues [4]
+# 60% of Mumbaikars struggle with weight issues
 is_overweight = np.random.binomial(1, 0.46, size=n_samples)  # 46% overweight
 is_obese = np.random.binomial(1, 0.12, size=n_samples)  # 12% obese
 
-# Diabetes - 18% of Mumbaikars aged 18-69 have diabetes [4]
+# Diabetes - 18% of Mumbaikars aged 18-69 have diabetes
 has_diabetes = []
 for i, age in enumerate(ages):
     if age < 18:
@@ -294,7 +292,7 @@ for i, age in enumerate(ages):
     if has_diabetes[i] == 0 and (is_overweight[i] or is_obese[i]):
         has_diabetes[i] = np.random.binomial(1, 0.2)  # Higher chance if overweight/obese
 
-# Hypertension - 26% of Mumbai's adult population [5]
+# Hypertension - 26% of Mumbai's adult population
 has_hypertension = []
 for i, age in enumerate(ages):
     if age < 18:
@@ -310,7 +308,7 @@ for i, age in enumerate(ages):
     if has_hypertension[i] == 0 and (is_overweight[i] or is_obese[i]):
         has_hypertension[i] = np.random.binomial(1, 0.3)  # Higher chance if overweight/obese
 
-# Asthma - rising in Mumbai, especially in children [6]
+# Asthma - rising in Mumbai, especially in children
 has_asthma = []
 for i, age in enumerate(ages):
     if age < 18:
@@ -355,19 +353,15 @@ for date in random_dates:
        (date.month == 10 and date.day >= 15 and date.day <= 25) or \
        (date.month == 9 and date.day >= 1 and date.day <= 10) or \
        (date.month == 3 and date.day >= 15 and date.day <= 20) or \
-       (date.month == 4 and date.day >= 10 and date.day <= 15):  # Ambedkar Jayanti/Baisakhi
+       (date.month == 4 and date.day >= 10 and date.day <= 15):
         is_holiday.append(1)
     else:
         is_holiday.append(0)
 
 # Generate distance to nearest hospital (km) - SDOH factor
-# "There is only one public dispensary per 64,468 people" [7]
-# 35% of Mumbai's population have poor access to healthcare [20]
 distance_to_hospital = []
 for i, area in enumerate(area_distribution):
-    if area in ['R-North', 'P-North', 'P-South', 'S', 'N', 'M-East', 'M-West']:  # Critical areas [20]
-        base_dist = 4.0  # Longer distance in critical areas
-    elif area == 'South Mumbai':
+    if area == 'South Mumbai':
         base_dist = 1.5
     elif area == 'Western Suburbs':
         base_dist = 2.5
@@ -473,7 +467,7 @@ for i in range(n_samples):
     else:
         temp_mod_er = 1.0
     
-    # Humidity effect - high humidity can exacerbate heat stress [8]
+    # Humidity effect - high humidity can exacerbate heat stress
     if humidity[i] > 80 and temperature[i] > 30:
         humidity_mod = 1.2  # High humidity + high temp increases visits
     else:
@@ -673,6 +667,31 @@ def add_realistic_outbreaks(df):
     df.loc[mask, 'ER_Visits'] = (df.loc[mask, 'ER_Visits'] * 
                                np.random.uniform(1.5, 2.0, size=mask.sum())).astype(int)
     
+    # Add more outbreaks to increase healthcare demand spikes
+    # Malaria outbreak in July 2022
+    malaria_start = datetime(2022, 7, 10)
+    malaria_end = datetime(2022, 7, 30)
+    mask = (df['Date'] >= malaria_start) & (df['Date'] <= malaria_end)
+    df.loc[mask, 'ER_Visits'] = (df.loc[mask, 'ER_Visits'] * 
+                               np.random.uniform(1.3, 1.5, size=mask.sum())).astype(int)
+    df.loc[mask, 'IsVectorDiseaseRisk'] = 1
+    
+    # Heat wave in May 2023
+    heatwave_start = datetime(2023, 5, 15)
+    heatwave_end = datetime(2023, 5, 25)
+    mask = (df['Date'] >= heatwave_start) & (df['Date'] <= heatwave_end)
+    df.loc[mask, 'Temperature'] += 3  # Increase temperature
+    df.loc[mask, 'ER_Visits'] = (df.loc[mask, 'ER_Visits'] * 
+                               np.random.uniform(1.4, 1.6, size=mask.sum())).astype(int)
+    
+    # Severe flooding in July 2024
+    flood_start = datetime(2024, 7, 25)
+    flood_end = datetime(2024, 8, 5)
+    mask = (df['Date'] >= flood_start) & (df['Date'] <= flood_end)
+    df.loc[mask, 'Precipitation'] = np.random.gamma(20, 10, size=mask.sum())  # Heavy rainfall
+    df.loc[mask, 'ER_Visits'] = (df.loc[mask, 'ER_Visits'] * 
+                               np.random.uniform(1.6, 2.2, size=mask.sum())).astype(int)
+    
     return df
 
 # Apply disease outbreaks
@@ -708,7 +727,7 @@ def calculate_validation_metrics(data):
     metrics['hypertension_prevalence'] = data['HasHypertension'].mean()
     metrics['asthma_prevalence'] = data['HasAsthma'].mean()
     
-    # Check healthcare spending based on SES (9.7% of income spent on healthcare) [7]
+    # Check healthcare spending based on SES (9.7% of income spent on healthcare)
     metrics['healthcare_spending_percent'] = 9.7
     
     return metrics
@@ -721,7 +740,7 @@ for key, value in validation_metrics.items():
     print(f"{key}: {value}")
 
 # Save to CSV
-synthetic_data.to_csv('components/data/mumbai_healthcare_demand_dataset.csv', index=False)
+synthetic_data.to_csv('mumbai_healthcare_demand_dataset.csv', index=False)
 
 print(f"\nSynthetic healthcare demand dataset for Mumbai with {n_samples} records created successfully!")
 print("Dataset saved as 'mumbai_healthcare_demand_dataset.csv'")
