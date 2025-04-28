@@ -16,6 +16,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 export function PatientAppointmentsList() {
   const { toast } = useToast()
@@ -48,6 +56,15 @@ export function PatientAppointmentsList() {
       status: "pending",
     },
   ])
+
+  const [viewDetailsDialogOpen, setViewDetailsDialogOpen] = useState(false)
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null)
+
+  const handleViewDetails = (appointment: any) => {
+    setSelectedAppointment(appointment)
+    setViewDetailsDialogOpen(true)
+  }
+
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [appointmentToCancel, setAppointmentToCancel] = useState<string | null>(null)
   const [rescheduleDialogOpen, setRescheduleDialogOpen] = useState(false)
@@ -140,7 +157,7 @@ export function PatientAppointmentsList() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button size="sm" variant="outline">
+              <Button size="sm" variant="outline" onClick={() => handleViewDetails(appointment)}>
                 View Details
               </Button>
               <DropdownMenu>
@@ -203,6 +220,82 @@ export function PatientAppointmentsList() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* View Details Dialog */}
+      <Dialog open={viewDetailsDialogOpen} onOpenChange={setViewDetailsDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Appointment Details</DialogTitle>
+            <DialogDescription>Detailed information about your appointment</DialogDescription>
+          </DialogHeader>
+          {selectedAppointment && (
+            <div className="space-y-4 py-4">
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Status:</span>
+                {getStatusBadge(selectedAppointment.status)}
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-medium">Provider Information</h3>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <span className="text-muted-foreground">Doctor:</span>
+                  <span>{selectedAppointment.doctor}</span>
+                  <span className="text-muted-foreground">Specialty:</span>
+                  <span>{selectedAppointment.specialty}</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-medium">Appointment Time</h3>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <span className="text-muted-foreground">Date:</span>
+                  <span>{selectedAppointment.date}</span>
+                  <span className="text-muted-foreground">Time:</span>
+                  <span>{selectedAppointment.time}</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-medium">Location</h3>
+                <div className="text-sm">
+                  <p>{selectedAppointment.location}</p>
+                  <p>1234 Medical Center Blvd</p>
+                  <p>Los Angeles, CA 90033</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-medium">Appointment Notes</h3>
+                <p className="text-sm text-muted-foreground">
+                  Follow-up appointment for regular check-up and medication review.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-medium">Preparation</h3>
+                <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
+                  <li>Bring current medications</li>
+                  <li>Bring insurance card</li>
+                  <li>Arrive 15 minutes early to complete paperwork</li>
+                </ul>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewDetailsDialogOpen(false)}>
+              Close
+            </Button>
+            <Button
+              onClick={() => {
+                setViewDetailsDialogOpen(false)
+                openRescheduleDialog(selectedAppointment?.id || "")
+              }}
+            >
+              Reschedule
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

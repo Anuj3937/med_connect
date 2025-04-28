@@ -40,6 +40,7 @@ export default function AppointmentsPage() {
     toast({
       title: "Appointment scheduled",
       description: "Your appointment has been scheduled successfully.",
+      variant: "success",
     })
   }
 
