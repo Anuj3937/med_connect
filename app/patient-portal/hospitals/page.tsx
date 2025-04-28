@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { PatientNearbyHospitals } from "@/components/patient/patient-nearby-hospitals"
-import { PatientHospitalMap } from "@/components/patient/patient-hospital-map"
 import { useAuth } from "@/components/auth-provider"
 import { useToast } from "@/hooks/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -16,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Slider } from "@/components/ui/slider"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { HospitalMap } from "@/components/map/hospital-map"
 
 export default function HospitalsPage() {
   const { user } = useAuth()
@@ -164,7 +164,9 @@ export default function HospitalsPage() {
               <CardDescription>Interactive map with OpenStreetMap integration</CardDescription>
             </CardHeader>
             <CardContent className="p-0 h-[600px]">
-              <PatientHospitalMap selectedHospital={selectedHospital} onSelectHospital={setSelectedHospital} />
+              <div className="h-full w-full">
+                <HospitalMap selectedHospital={selectedHospital} onSelectHospital={setSelectedHospital} />
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -175,7 +177,7 @@ export default function HospitalsPage() {
           <CardHeader>
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
               <div>
-                <CardTitle>Memorial General Hospital</CardTitle>
+                <CardTitle>Lilavati Hospital</CardTitle>
                 <CardDescription>Level I Trauma Center</CardDescription>
                 <div className="flex items-center mt-2">
                   <div className="flex">
@@ -203,7 +205,9 @@ export default function HospitalsPage() {
               <div className="space-y-4">
                 <div>
                   <h3 className="text-sm font-medium mb-1">Address</h3>
-                  <p className="text-sm text-muted-foreground">1234 Medical Center Blvd, Los Angeles, CA 90033</p>
+                  <p className="text-sm text-muted-foreground">
+                    A-791, Bandra Reclamation, Bandra West, Mumbai, Maharashtra 400050
+                  </p>
                   <Button variant="link" className="p-0 h-auto text-sm mt-1">
                     Get Directions
                     <ArrowRight className="ml-1 h-3 w-3" />
@@ -211,7 +215,7 @@ export default function HospitalsPage() {
                 </div>
                 <div>
                   <h3 className="text-sm font-medium mb-1">Phone</h3>
-                  <p className="text-sm text-muted-foreground">(213) 555-1234</p>
+                  <p className="text-sm text-muted-foreground">+91 22 2675 1000</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium mb-1">Hours</h3>
