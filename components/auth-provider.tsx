@@ -262,9 +262,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isLoading && user.type) {
       // If user is logged in but accessing wrong portal or login page
-      if (user.type === "patient" && pathname.startsWith("/hospital-portal")) {
+      if (user.type === "patient" && pathname.startsWith("/patient-portal")) {
         router.push("/patient-portal")
-      } else if (user.type === "hospital" && pathname.startsWith("/patient-portal")) {
+      } else if (user.type === "hospital" && pathname.startsWith("/hospital-portal")) {
         router.push("/hospital-portal")
       } else if (user.type === "pharmacy" && !pathname.startsWith("/pharmacy-portal")) {
         router.push("/pharmacy-portal")
