@@ -7,7 +7,6 @@ import { AlertTriangle, BarChart3, Download, Plus, Truck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { HospitalInventorySummary } from "@/components/hospital/hospital-inventory-summary"
 import { HospitalDemandForecast } from "@/components/hospital/hospital-demand-forecast"
@@ -15,6 +14,9 @@ import { HospitalSupplyChainMap } from "@/components/hospital/hospital-supply-ch
 import { HospitalResourceAllocation } from "@/components/hospital/hospital-resource-allocation"
 import { HospitalAlertsList } from "@/components/hospital/hospital-alerts-list"
 import { HospitalOrdersList } from "@/components/hospital/hospital-orders-list"
+import { HospitalDashboardCards } from "@/components/hospital/hospital-dashboard-cards"
+import { HospitalStaffManagement } from "@/components/hospital/hospital-staff-management"
+import { HospitalBedManagement } from "@/components/hospital/hospital-bed-management"
 
 export default function HospitalPortalPage() {
   const { user } = useAuth()
@@ -27,7 +29,9 @@ export default function HospitalPortalPage() {
     else setGreeting("Good evening")
   }, [])
 
-  const hospitalName = user.hospitalName || "Hospital"
+  const hospitalName = user?.hospitalName || "Lilavati Hospital"
+  const hospitalAddress = "A-791, Bandra Reclamation, Bandra West, Mumbai, Maharashtra 400050"
+  const hospitalPincode = "400050"
 
   return (
     <div className="container py-6">
@@ -37,6 +41,7 @@ export default function HospitalPortalPage() {
         </h1>
         <p className="text-muted-foreground">
           Here's an overview of your hospital's supply chain and resource management.
+          <span className="ml-2 text-sm font-medium">PIN Code: {hospitalPincode}</span>
         </p>
       </div>
 
@@ -44,76 +49,18 @@ export default function HospitalPortalPage() {
         <AlertTriangle className="h-4 w-4 text-amber-600" />
         <AlertTitle>Demand Spike Predicted</AlertTitle>
         <AlertDescription>
-          A 20% increase in ER visits is predicted in ZIP code 12345 within the next 6 weeks due to rising unemployment
-          rates. Consider increasing staffing and inventory levels.
+          A 20% increase in ER visits is predicted in Bandra West (PIN 400050) within the next 6 weeks due to rising
+          dengue cases. Consider increasing staffing and inventory levels.
         </AlertDescription>
       </Alert>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Inventory Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">86%</div>
-            <p className="text-xs text-muted-foreground mt-1">Overall inventory level</p>
-            <div className="mt-2 flex items-center text-xs">
-              <Badge variant="outline" className="text-amber-500 border-amber-200 bg-amber-50">
-                3 items below threshold
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
+      <HospitalDashboardCards />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground mt-1">Orders awaiting delivery</p>
-            <div className="mt-2 flex items-center text-xs">
-              <Badge variant="outline" className="text-blue-500 border-blue-200 bg-blue-50">
-                Next delivery: Tomorrow
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Critical Supplies</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2</div>
-            <p className="text-xs text-muted-foreground mt-1">Items at critical level</p>
-            <div className="mt-2 flex items-center text-xs">
-              <Badge variant="outline" className="text-red-500 border-red-200 bg-red-50">
-                Urgent: IV Solution (2 days left)
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Resource Utilization</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">72%</div>
-            <p className="text-xs text-muted-foreground mt-1">Overall resource utilization</p>
-            <div className="mt-2 flex items-center text-xs">
-              <Badge variant="outline" className="text-green-500 border-green-200 bg-green-50">
-                Optimal efficiency
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="inventory" className="space-y-8">
+      <Tabs defaultValue="inventory" className="space-y-8 mt-8">
         <TabsList>
           <TabsTrigger value="inventory">Inventory</TabsTrigger>
+          <TabsTrigger value="staff">Staff Management</TabsTrigger>
+          <TabsTrigger value="beds">Bed Management</TabsTrigger>
           <TabsTrigger value="forecast">Demand Forecast</TabsTrigger>
           <TabsTrigger value="supply-chain">Supply Chain</TabsTrigger>
           <TabsTrigger value="resources">Resource Allocation</TabsTrigger>
@@ -135,6 +82,14 @@ export default function HospitalPortalPage() {
             </div>
           </div>
           <HospitalInventorySummary />
+        </TabsContent>
+
+        <TabsContent value="staff" className="space-y-6">
+          <HospitalStaffManagement />
+        </TabsContent>
+
+        <TabsContent value="beds" className="space-y-6">
+          <HospitalBedManagement />
         </TabsContent>
 
         <TabsContent value="forecast" className="space-y-6">
