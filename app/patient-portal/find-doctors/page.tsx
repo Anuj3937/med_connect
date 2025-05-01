@@ -1,29 +1,63 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import Papa from "papaparse"
 import { DoctorSearch } from "@/components/patient/doctor-search"
 import { DoctorCard } from "@/components/patient/doctor-card"
 
+const CSV_URL = "/doctors_multi_city_specialization.csv"
+
 export default function FindDoctorsPage() {
+  const [allDoctors, setAllDoctors] = useState<any[]>([])
   const [filteredDoctors, setFilteredDoctors] = useState<any[]>([])
 
+  useEffect(() => {
+    fetch(CSV_URL)
+      .then(res => res.text())
+      .then(text => {
+        Papa.parse(text, {
+          header: true,
+          skipEmptyLines: true,
+          complete: (results) => {
+            const doctors = (results.data as any[]).map((row, idx) => ({
+              id: `${row.Name || "Unknown"}-${idx}`,
+              name: row.Name || "Unknown",
+              specialization: row.Specialization || "",
+              experience: row.Experience || "",
+              fees: row.Fees || "",
+              location: row.City || "",
+              address: row.Location || "",
+              phone: row["Phone Number"] || "",
+            }))
+            setAllDoctors(doctors)
+            setFilteredDoctors(doctors)
+          }
+        })
+      })
+  }, [])
+
+  function handleSearch(results: any[]) {
+    setFilteredDoctors(results)
+  }
+
   return (
-    <div className="container py-6">
-      <h1 className="text-3xl font-bold tracking-tight mb-2">Find Doctors</h1>
-      <p className="text-muted-foreground mb-6">Search for doctors based on specialization, experience, and location</p>
-
-      <DoctorSearch onSearchResults={setFilteredDoctors} />
-
+    <div className="max-w-4xl mx-auto py-8 px-2">
+      <h1 className="text-3xl font-bold mb-2">Find Doctors</h1>
+      <p className="mb-6 text-gray-600">Search for doctors based on specialization, experience, and location</p>
+      <DoctorSearch allDoctors={allDoctors} onSearchResults={handleSearch} />
       <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">
-          {filteredDoctors.length > 0 ? `${filteredDoctors.length} doctors found` : "Start searching to find doctors"}
-        </h2>
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filteredDoctors.map((doctor) => (
-            <DoctorCard key={doctor.id} doctor={doctor} />
-          ))}
-        </div>
+        {filteredDoctors.length > 0 ? (
+          <div>
+            <div className="mb-4 text-gray-700 font-semibold">{filteredDoctors.length} doctors found</div>
+            <div className="grid gap-4">
+              {filteredDoctors.map((doctor) => (
+                <DoctorCard key={doctor.id} doctor={doctor} />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="text-gray-500">No doctors found. Try adjusting your search.</div>
+        )}
       </div>
     </div>
   )
