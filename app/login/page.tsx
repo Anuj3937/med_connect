@@ -98,7 +98,7 @@ export default function LoginPage() {
         <div className="hidden md:flex flex-col items-center justify-center space-y-6">
           <div className="relative w-64 h-64">
             <Image
-              src="/placeholder.svg?height=256&width=256"
+              src="/mma.png?height=256&width=256"
               alt="MediConnect Logo"
               fill
               className="object-contain"
