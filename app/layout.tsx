@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "MediConnect - Healthcare Supply Chain & Resource Management",
   description: "A comprehensive platform for healthcare supply chain management and resource allocation",
-    generator: 'v0.dev'
+    generator: 'mediconnect'
 }
 
 export default function RootLayout({
