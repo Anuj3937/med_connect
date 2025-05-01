@@ -34,16 +34,16 @@ export function MainNav() {
       href: "/patient-portal/hospitals",
       active: pathname === "/patient-portal/hospitals",
     },
-    {
-      title: "Medications",
-      href: "/patient-portal/medications",
-      active: pathname === "/patient-portal/medications",
-    },
-    {
-      title: "Health Records",
-      href: "/patient-portal/records",
-      active: pathname === "/patient-portal/records",
-    },
+    // {
+    //   title: "Medications",
+    //   href: "/patient-portal/medications",
+    //   active: pathname === "/patient-portal/medications",
+    // },
+    // {
+    //   title: "Health Records",
+    //   href: "/patient-portal/records",
+    //   active: pathname === "/patient-portal/records",
+    // },
     {
       title: "Find Doctors",
       href: "/patient-portal/find-doctors",

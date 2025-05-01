@@ -102,7 +102,7 @@ export default function PatientPortalPage() {
 
       <Tabs defaultValue="appointments" className="space-y-8">
         <TabsList>
-          <TabsTrigger value="appointments">Appointments</TabsTrigger>
+          {/* <TabsTrigger value="appointments">Appointments</TabsTrigger> */}
           <TabsTrigger value="medications">Medications</TabsTrigger>
           <TabsTrigger value="health">Health</TabsTrigger>
           <TabsTrigger value="hospitals">Nearby Hospitals</TabsTrigger>
