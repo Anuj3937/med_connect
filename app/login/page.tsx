@@ -121,7 +121,7 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="patient" className="w-full" onValueChange={setActiveTab}>
-              <TabsList className="grid grid-cols-4 mb-6">
+              <TabsList className="grid grid-cols-2 mb-6">
                 <TabsTrigger value="patient" className="data-[state=active]:bg-blue-50">
                   <User className="mr-2 h-4 w-4" />
                   Patient
@@ -129,14 +129,6 @@ export default function LoginPage() {
                 <TabsTrigger value="hospital" className="data-[state=active]:bg-blue-50">
                   <Hospital className="mr-2 h-4 w-4" />
                   Hospital
-                </TabsTrigger>
-                <TabsTrigger value="pharmacy" className="data-[state=active]:bg-blue-50">
-                  <Pill className="mr-2 h-4 w-4" />
-                  Pharmacy
-                </TabsTrigger>
-                <TabsTrigger value="admin" className="data-[state=active]:bg-blue-50">
-                  <ShieldCheck className="mr-2 h-4 w-4" />
-                  Admin
                 </TabsTrigger>
               </TabsList>
 
