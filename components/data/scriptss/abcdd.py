@@ -1276,7 +1276,7 @@ def retrain_endpoint():
 
 # Main function to run the API
 def run_api():
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=5001, debug=False)
 
 # If this script is run directly, start the API server
 if __name__ == "__main__":
