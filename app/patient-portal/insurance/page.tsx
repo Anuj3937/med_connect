@@ -15,35 +15,35 @@ import { Skeleton } from "@/components/ui/skeleton"
 // Mock insurance data
 const mockInsuranceData = {
   active: true,
-  planName: "HealthPlus Premium",
-  memberId: "HP78923456",
+  planName: "Star Health Premium",
+  memberId: "SH78923456",
   groupNumber: "GRP123456",
   effectiveDate: "2023-01-01",
   expirationDate: "2023-12-31",
-  primaryCareProvider: "Dr. Sarah Johnson",
+  primaryCareProvider: "Dr. Rajesh Sharma",
   deductible: {
-    individual: 1500,
-    family: 3000,
-    remaining: 750,
+    individual: 15000,
+    family: 30000,
+    remaining: 7500,
   },
   outOfPocketMax: {
-    individual: 5000,
-    family: 10000,
-    remaining: 3500,
+    individual: 50000,
+    family: 100000,
+    remaining: 35000,
   },
   coverageDetails: [
-    { service: "Primary Care Visit", coverage: "90%", copay: "$20" },
-    { service: "Specialist Visit", coverage: "80%", copay: "$40" },
-    { service: "Emergency Room", coverage: "85%", copay: "$150" },
-    { service: "Urgent Care", coverage: "85%", copay: "$50" },
-    { service: "Hospital Stay", coverage: "80%", copay: "$250 per day" },
-    { service: "Prescription - Generic", coverage: "90%", copay: "$10" },
-    { service: "Prescription - Brand", coverage: "70%", copay: "$30" },
-    { service: "Prescription - Specialty", coverage: "60%", copay: "$100" },
-    { service: "Lab Work", coverage: "90%", copay: "$0" },
-    { service: "X-Ray", coverage: "80%", copay: "$40" },
-    { service: "MRI/CT Scan", coverage: "70%", copay: "$100" },
-    { service: "Physical Therapy", coverage: "80%", copay: "$30" },
+    { service: "Primary Care Visit", coverage: "90%", copay: "₹200" },
+    { service: "Specialist Visit", coverage: "80%", copay: "₹400" },
+    { service: "Emergency Room", coverage: "85%", copay: "₹1500" },
+    { service: "Urgent Care", coverage: "85%", copay: "₹500" },
+    { service: "Hospital Stay", coverage: "80%", copay: "₹2500 per day" },
+    { service: "Prescription - Generic", coverage: "90%", copay: "₹100" },
+    { service: "Prescription - Brand", coverage: "70%", copay: "₹300" },
+    { service: "Prescription - Specialty", coverage: "60%", copay: "₹1000" },
+    { service: "Lab Work", coverage: "90%", copay: "₹0" },
+    { service: "X-Ray", coverage: "80%", copay: "₹400" },
+    { service: "MRI/CT Scan", coverage: "70%", copay: "₹1000" },
+    { service: "Physical Therapy", coverage: "80%", copay: "₹300" },
   ],
   recentClaims: [
     {
@@ -51,9 +51,9 @@ const mockInsuranceData = {
       date: "2023-10-15",
       provider: "City Medical Center",
       service: "Annual Physical",
-      billed: 350,
-      covered: 315,
-      patientResponsibility: 35,
+      billed: 3500,
+      covered: 3150,
+      patientResponsibility: 350,
       status: "Processed",
     },
     {
@@ -61,9 +61,9 @@ const mockInsuranceData = {
       date: "2023-09-22",
       provider: "MedLab Diagnostics",
       service: "Blood Work",
-      billed: 220,
-      covered: 198,
-      patientResponsibility: 22,
+      billed: 2200,
+      covered: 1980,
+      patientResponsibility: 220,
       status: "Processed",
     },
     {
@@ -71,9 +71,9 @@ const mockInsuranceData = {
       date: "2023-08-05",
       provider: "Wellness Pharmacy",
       service: "Prescription - Lisinopril",
-      billed: 45,
-      covered: 40.5,
-      patientResponsibility: 4.5,
+      billed: 450,
+      covered: 405,
+      patientResponsibility: 45,
       status: "Processed",
     },
     {
@@ -81,9 +81,9 @@ const mockInsuranceData = {
       date: "2023-11-01",
       provider: "Specialist Care Center",
       service: "Cardiology Consultation",
-      billed: 275,
-      covered: 220,
-      patientResponsibility: 55,
+      billed: 2750,
+      covered: 2200,
+      patientResponsibility: 550,
       status: "Pending",
     },
   ],
@@ -133,14 +133,14 @@ export default function InsuranceVerificationPage() {
                   <SelectValue placeholder="Select provider" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="aetna">Aetna</SelectItem>
-                  <SelectItem value="bluecross">Blue Cross Blue Shield</SelectItem>
-                  <SelectItem value="cigna">Cigna</SelectItem>
-                  <SelectItem value="humana">Humana</SelectItem>
-                  <SelectItem value="kaiser">Kaiser Permanente</SelectItem>
-                  <SelectItem value="medicare">Medicare</SelectItem>
-                  <SelectItem value="medicaid">Medicaid</SelectItem>
-                  <SelectItem value="unitedhealth">UnitedHealthcare</SelectItem>
+                  <SelectItem value="star">Star Health Insurance</SelectItem>
+                  <SelectItem value="hdfc">HDFC ERGO Health Insurance</SelectItem>
+                  <SelectItem value="icici">ICICI Lombard Health Insurance</SelectItem>
+                  <SelectItem value="bajaj">Bajaj Allianz Health Insurance</SelectItem>
+                  <SelectItem value="max">Max Bupa Health Insurance</SelectItem>
+                  <SelectItem value="apollo">Apollo Munich Health Insurance</SelectItem>
+                  <SelectItem value="reliance">Reliance Health Insurance</SelectItem>
+                  <SelectItem value="sbi">SBI Health Insurance</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -281,19 +281,19 @@ export default function InsuranceVerificationPage() {
                           <div>
                             <dt className="text-sm font-medium text-muted-foreground">Individual</dt>
                             <dd className="text-2xl font-bold">
-                              ${verificationResult.deductible.individual.toLocaleString()}
+                              ₹{verificationResult.deductible.individual.toLocaleString()}
                             </dd>
                           </div>
                           <div>
                             <dt className="text-sm font-medium text-muted-foreground">Family</dt>
                             <dd className="text-2xl font-bold">
-                              ${verificationResult.deductible.family.toLocaleString()}
+                              ₹{verificationResult.deductible.family.toLocaleString()}
                             </dd>
                           </div>
                           <div>
                             <dt className="text-sm font-medium text-muted-foreground">Remaining</dt>
                             <dd className="text-2xl font-bold text-amber-600">
-                              ${verificationResult.deductible.remaining.toLocaleString()}
+                              ₹{verificationResult.deductible.remaining.toLocaleString()}
                             </dd>
                           </div>
                         </dl>
@@ -309,19 +309,19 @@ export default function InsuranceVerificationPage() {
                           <div>
                             <dt className="text-sm font-medium text-muted-foreground">Individual</dt>
                             <dd className="text-2xl font-bold">
-                              ${verificationResult.outOfPocketMax.individual.toLocaleString()}
+                              ₹{verificationResult.outOfPocketMax.individual.toLocaleString()}
                             </dd>
                           </div>
                           <div>
                             <dt className="text-sm font-medium text-muted-foreground">Family</dt>
                             <dd className="text-2xl font-bold">
-                              ${verificationResult.outOfPocketMax.family.toLocaleString()}
+                              ₹{verificationResult.outOfPocketMax.family.toLocaleString()}
                             </dd>
                           </div>
                           <div>
                             <dt className="text-sm font-medium text-muted-foreground">Remaining</dt>
                             <dd className="text-2xl font-bold text-amber-600">
-                              ${verificationResult.outOfPocketMax.remaining.toLocaleString()}
+                              ₹{verificationResult.outOfPocketMax.remaining.toLocaleString()}
                             </dd>
                           </div>
                         </dl>
@@ -358,9 +358,9 @@ export default function InsuranceVerificationPage() {
                           <TableCell>{new Date(claim.date).toLocaleDateString()}</TableCell>
                           <TableCell>{claim.provider}</TableCell>
                           <TableCell>{claim.service}</TableCell>
-                          <TableCell className="text-right">${claim.billed.toFixed(2)}</TableCell>
-                          <TableCell className="text-right">${claim.covered.toFixed(2)}</TableCell>
-                          <TableCell className="text-right">${claim.patientResponsibility.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">₹{claim.billed.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">₹{claim.covered.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">₹{claim.patientResponsibility.toFixed(2)}</TableCell>
                           <TableCell>
                             <Badge variant={claim.status === "Processed" ? "outline" : "secondary"}>
                               {claim.status}

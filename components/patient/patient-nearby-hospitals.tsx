@@ -36,6 +36,88 @@ interface Location {
   services?: string[]
 }
 
+// Mock data for nearby hospitals in India
+const mockHospitals = [
+  {
+    id: "1",
+    name: "Lilavati Hospital",
+    type: "hospitals",
+    category: "hospital",
+    distance: "0.8 miles",
+    address: "A-791, Bandra Reclamation, Bandra West, Mumbai, Maharashtra 400050",
+    rating: 4.2,
+    waitTime: "30 min",
+    services: ["Emergency Care", "Surgery", "Cardiology", "Neurology"],
+    zipCode: "400050",
+    phone: "022 2675 1000",
+  },
+  {
+    id: "2",
+    name: "Kokilaben Dhirubhai Ambani Hospital",
+    type: "hospitals",
+    category: "hospital",
+    distance: "1.5 miles",
+    address: "Rao Saheb Achutrao Patwardhan Marg, Four Bungalows, Andheri West, Mumbai, Maharashtra 400053",
+    rating: 4.5,
+    waitTime: "15 min",
+    services: ["Emergency Care", "Oncology", "Orthopedics", "Pediatrics"],
+    zipCode: "400053",
+    phone: "022 3061 7000",
+  },
+  {
+    id: "3",
+    name: "Hinduja Hospital",
+    type: "hospitals",
+    category: "hospital",
+    distance: "2.3 miles",
+    address: "Veer Savarkar Marg, Mahim West, Mumbai, Maharashtra 400016",
+    rating: 4.3,
+    waitTime: "45 min",
+    services: ["Emergency Care", "Neurology", "Cardiology", "Gastroenterology"],
+    zipCode: "400016",
+    phone: "022 2444 9199",
+  },
+  {
+    id: "4",
+    name: "Apollo Pharmacy",
+    type: "pharmacies",
+    category: "pharmacy",
+    distance: "0.5 miles",
+    address: "Shop No. 1, Ground Floor, Bandra West, Mumbai, Maharashtra 400050",
+    rating: 4.0,
+    waitTime: "5 min",
+    services: ["Prescription Drugs", "OTC Medicines", "Medical Supplies"],
+    zipCode: "400050",
+    phone: "022 2640 0000",
+  },
+  {
+    id: "5",
+    name: "MedPlus Pharmacy",
+    type: "pharmacies",
+    category: "pharmacy",
+    distance: "1.2 miles",
+    address: "Shop No. 3, Link Road, Andheri West, Mumbai, Maharashtra 400053",
+    rating: 3.8,
+    waitTime: "10 min",
+    services: ["Prescription Drugs", "OTC Medicines", "Health Products"],
+    zipCode: "400053",
+    phone: "022 2630 0000",
+  },
+  {
+    id: "6",
+    name: "Surgical Equipment India",
+    type: "equipment",
+    category: "equipment",
+    distance: "3.1 miles",
+    address: "Industrial Area, Andheri East, Mumbai, Maharashtra 400069",
+    rating: 4.1,
+    waitTime: null,
+    services: ["Medical Equipment", "Surgical Supplies", "Hospital Furniture"],
+    zipCode: "400069",
+    phone: "022 2680 0000",
+  },
+]
+
 interface PatientNearbyHospitalsProps {
   filterType?: string
   onSelectHospital?: (id: string) => void
@@ -49,113 +131,15 @@ export function PatientNearbyHospitals({
 }: PatientNearbyHospitalsProps) {
   const { user } = useAuth()
   const { toast } = useToast()
-  const userZipCode = user.zipCode || "12345"
+  const userZipCode = user.zipCode || "400001"
   const [activeTab, setActiveTab] = useState<string>("all")
 
   // Simulated nearby locations based on user's ZIP code
-  const [locations] = useState<Location[]>([
-    // Hospitals
-    {
-      id: "hosp-1",
-      name: "Memorial General Hospital",
-      type: "Level I Trauma Center",
-      category: "hospital",
-      address: "1234 Medical Center Blvd, Los Angeles, CA 90033",
-      phone: "(213) 555-1234",
-      distance: "1.2 miles",
-      waitTime: "15 min",
-      bedAvailability: "High",
-      zipCode: "12345",
-      rating: 4.2,
-      services: ["Emergency Care", "Surgery", "Cardiology", "Neurology", "Pediatrics"],
-    },
-    {
-      id: "hosp-2",
-      name: "University Medical Center",
-      type: "Academic Medical Center",
-      category: "hospital",
-      address: "5678 University Ave, Los Angeles, CA 90007",
-      phone: "(213) 555-5678",
-      distance: "2.8 miles",
-      waitTime: "30 min",
-      bedAvailability: "Medium",
-      zipCode: "12345",
-      rating: 4.5,
-      services: ["Emergency Care", "Oncology", "Orthopedics", "Radiology", "Research"],
-    },
-    {
-      id: "hosp-3",
-      name: "Riverside Community Hospital",
-      type: "Community Hospital",
-      category: "hospital",
-      address: "910 Riverside Dr, Riverside, CA 92501",
-      phone: "(951) 555-9101",
-      distance: "5.4 miles",
-      waitTime: "45 min",
-      bedAvailability: "Low",
-      zipCode: "23456",
-      rating: 3.8,
-      services: ["Emergency Care", "Primary Care", "Maternity", "Geriatrics"],
-    },
-    // Pharmacies
-    {
-      id: "pharm-1",
-      name: "MediCare Pharmacy",
-      type: "24-Hour Pharmacy",
-      category: "pharmacy",
-      address: "123 Health St, Los Angeles, CA 90033",
-      phone: "(213) 555-2345",
-      distance: "0.8 miles",
-      openHours: "24 hours",
-      zipCode: "12345",
-      rating: 4.0,
-      services: ["Prescription Filling", "Vaccinations", "Health Consultations", "Medical Supplies"],
-    },
-    {
-      id: "pharm-2",
-      name: "Community Rx",
-      type: "Retail Pharmacy",
-      category: "pharmacy",
-      address: "456 Wellness Ave, Los Angeles, CA 90007",
-      phone: "(213) 555-3456",
-      distance: "1.5 miles",
-      openHours: "8:00 AM - 10:00 PM",
-      zipCode: "12345",
-      rating: 4.3,
-      services: ["Prescription Filling", "OTC Medications", "Health Screenings", "Delivery"],
-    },
-    // Equipment Providers
-    {
-      id: "equip-1",
-      name: "MediSupply Equipment",
-      type: "Medical Equipment Provider",
-      category: "equipment",
-      address: "789 Device Blvd, Los Angeles, CA 90033",
-      phone: "(213) 555-4567",
-      distance: "1.2 miles",
-      openHours: "9:00 AM - 6:00 PM",
-      zipCode: "12345",
-      rating: 4.1,
-      services: ["Mobility Aids", "Home Medical Equipment", "Respiratory Equipment", "Rentals"],
-    },
-    {
-      id: "equip-2",
-      name: "Healthcare Equipment Solutions",
-      type: "Specialized Equipment Provider",
-      category: "equipment",
-      address: "321 Support St, Los Angeles, CA 90007",
-      phone: "(213) 555-5678",
-      distance: "2.3 miles",
-      openHours: "8:00 AM - 7:00 PM",
-      zipCode: "12345",
-      rating: 3.9,
-      services: ["Hospital Beds", "Lift Chairs", "Wound Care Supplies", "Custom Equipment"],
-    },
-  ])
+  const [locations] = useState<Location[]>(mockHospitals)
 
   // Filter locations by user's ZIP code, optional filter type, and active tab
   const filteredLocations = locations.filter((location) => {
-    if (location.zipCode !== userZipCode) return false
+    // if (location.zipCode !== userZipCode) return false
     if (filterType && location.category !== filterType) return false
     if (activeTab === "hospitals" && location.category !== "hospital") return false
     if (activeTab === "pharmacies" && location.category !== "pharmacy") return false

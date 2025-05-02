@@ -178,7 +178,7 @@ export default function HospitalsPage() {
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
               <div>
                 <CardTitle>Lilavati Hospital</CardTitle>
-                <CardDescription>Level I Trauma Center</CardDescription>
+                <CardDescription>Multi-Specialty Hospital</CardDescription>
                 <div className="flex items-center mt-2">
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
