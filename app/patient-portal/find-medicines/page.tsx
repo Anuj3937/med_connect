@@ -9,7 +9,7 @@ type Medicine = {
   type: string;
   pack_size_label: string;
   short_composition1: string;
-  imageUrl?: string;
+  image_url?: string;
   availability?: string;
 };
 

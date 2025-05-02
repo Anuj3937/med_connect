@@ -7,14 +7,14 @@ type Medicine = {
   type: string;
   pack_size_label: string;
   short_composition1: string;
-  imageUrl?: string; // optional, for future use
+  image_url?: string; // optional, for future use
   availability?: string; // optional, for future use
 };
 
 const MedicineCard = ({ med }: { med: Medicine }) => (
   <div className="border rounded-lg shadow p-4 flex flex-col items-center w-64 bg-white">
     <img
-      src={med.imageUrl || "https://via.placeholder.com/120x120?text=Medicine"}
+      src={med.image_url || "https://via.placeholder.com/120x120?text=Medicine"}
       alt={med.name}
       className="mb-2 w-24 h-24 object-contain"
     />
