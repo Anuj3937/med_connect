@@ -4,6 +4,7 @@ import { useState } from "react"
 import { EquipmentSearch } from "@/components/patient/equipment-search"
 import { EquipmentCard } from "@/components/patient/equipment-card"
 import { PriceComparisonTable } from "@/components/patient/price-comparison-table"
+import { AyushEquipmentSection } from "@/components/patient/ayush-equipment-section"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
@@ -19,7 +20,7 @@ export default function FindEquipmentPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight mb-2">Find Medical Equipment</h1>
         <p className="text-muted-foreground">
-          Search for medical equipment based on type, features, and compare prices
+          Search for medical equipment based on type, features, and compare prices across India
         </p>
       </div>
 
@@ -69,6 +70,8 @@ export default function FindEquipmentPage() {
               </CardContent>
             </Card>
           )}
+
+          <AyushEquipmentSection />
         </TabsContent>
 
         <TabsContent value="suppliers" className="mt-4">
@@ -118,6 +121,14 @@ export default function FindEquipmentPage() {
                           ))}
                         </div>
                       </dd>
+                    </div>
+                    <div className="md:col-span-2 mt-2">
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                        GST: 12% included in price
+                      </Badge>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        *Prices include GST. Additional charges may apply for delivery outside city limits.
+                      </p>
                     </div>
                   </dl>
                 </CardContent>

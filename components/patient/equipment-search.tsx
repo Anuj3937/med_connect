@@ -11,7 +11,7 @@ import { Slider } from "@/components/ui/slider"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 
-// Mock data for equipment
+// Update the mockEquipment array with Indian prices and context
 const mockEquipment = [
   {
     id: "eq1",
@@ -19,7 +19,7 @@ const mockEquipment = [
     manufacturer: "Omron",
     category: "Monitoring",
     features: ["Bluetooth", "Memory Storage", "Portable"],
-    price: 49.99,
+    price: 2499,
     rating: 4.5,
     availability: true,
     image: "/placeholder.svg?height=100&width=100",
@@ -27,10 +27,10 @@ const mockEquipment = [
   {
     id: "eq2",
     name: "Wheelchair",
-    manufacturer: "Drive Medical",
+    manufacturer: "KosmoCare",
     category: "Mobility",
     features: ["Foldable", "Adjustable", "Lightweight"],
-    price: 199.99,
+    price: 8999,
     rating: 4.2,
     availability: true,
     image: "/placeholder.svg?height=100&width=100",
@@ -41,7 +41,7 @@ const mockEquipment = [
     manufacturer: "Philips Respironics",
     category: "Respiratory",
     features: ["Portable", "Battery Operated", "Quiet Operation"],
-    price: 699.99,
+    price: 35999,
     rating: 4.8,
     availability: true,
     image: "/placeholder.svg?height=100&width=100",
@@ -49,10 +49,10 @@ const mockEquipment = [
   {
     id: "eq4",
     name: "Hospital Bed",
-    manufacturer: "Invacare",
+    manufacturer: "Paramount",
     category: "Furniture",
     features: ["Electric", "Adjustable Height", "Side Rails"],
-    price: 899.99,
+    price: 45999,
     rating: 4.3,
     availability: false,
     image: "/placeholder.svg?height=100&width=100",
@@ -63,7 +63,7 @@ const mockEquipment = [
     manufacturer: "ResMed",
     category: "Respiratory",
     features: ["Auto-adjusting", "Humidifier", "Quiet"],
-    price: 849.99,
+    price: 42999,
     rating: 4.7,
     availability: true,
     image: "/placeholder.svg?height=100&width=100",
@@ -71,10 +71,10 @@ const mockEquipment = [
   {
     id: "eq6",
     name: "Nebulizer",
-    manufacturer: "DeVilbiss",
+    manufacturer: "Dr. Trust",
     category: "Respiratory",
     features: ["Portable", "Battery Option", "Quiet Operation"],
-    price: 59.99,
+    price: 2999,
     rating: 4.4,
     availability: true,
     image: "/placeholder.svg?height=100&width=100",
@@ -82,10 +82,10 @@ const mockEquipment = [
   {
     id: "eq7",
     name: "Oxygen Cylinder",
-    manufacturer: "Invacare",
+    manufacturer: "Everest Kanto",
     category: "Respiratory",
     features: ["Portable", "Lightweight", "Durable"],
-    price: 129.99,
+    price: 6499,
     rating: 4.6,
     availability: true,
     image: "/placeholder.svg?height=100&width=100",
@@ -93,11 +93,33 @@ const mockEquipment = [
   {
     id: "eq8",
     name: "Walker",
-    manufacturer: "Drive Medical",
+    manufacturer: "Vissco",
     category: "Mobility",
     features: ["Foldable", "Adjustable Height", "Lightweight"],
-    price: 69.99,
+    price: 3499,
     rating: 4.5,
+    availability: true,
+    image: "/placeholder.svg?height=100&width=100",
+  },
+  {
+    id: "eq9",
+    name: "Glucometer",
+    manufacturer: "Accu-Chek",
+    category: "Monitoring",
+    features: ["Digital", "Fast Results", "Memory Storage"],
+    price: 1299,
+    rating: 4.6,
+    availability: true,
+    image: "/placeholder.svg?height=100&width=100",
+  },
+  {
+    id: "eq10",
+    name: "Pulse Oximeter",
+    manufacturer: "Dr. Morepen",
+    category: "Monitoring",
+    features: ["Fingertip", "LED Display", "Portable"],
+    price: 1499,
+    rating: 4.3,
     availability: true,
     image: "/placeholder.svg?height=100&width=100",
   },
@@ -111,7 +133,8 @@ export function EquipmentSearch({ onSearchResults }: EquipmentSearchProps) {
   const [showFilters, setShowFilters] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [category, setCategory] = useState("all")
-  const [priceRange, setPriceRange] = useState([0, 1000])
+  // Update the price range slider to reflect Indian prices
+  const [priceRange, setPriceRange] = useState([0, 50000])
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
   const [inStockOnly, setInStockOnly] = useState(false)
 
@@ -176,10 +199,11 @@ export function EquipmentSearch({ onSearchResults }: EquipmentSearchProps) {
     onSearchResults(results)
   }, [searchTerm, category, priceRange, selectedFeatures, inStockOnly, onSearchResults])
 
+  // In the resetFilters function, update the price range reset value
   const resetFilters = () => {
     setSearchTerm("")
     setCategory("all")
-    setPriceRange([0, 1000])
+    setPriceRange([0, 50000])
     setSelectedFeatures([])
     setInStockOnly(false)
   }
@@ -258,8 +282,8 @@ export function EquipmentSearch({ onSearchResults }: EquipmentSearchProps) {
                 <Slider
                   id="priceRange"
                   min={0}
-                  max={1000}
-                  step={10}
+                  max={50000}
+                  step={1000}
                   value={priceRange}
                   onValueChange={setPriceRange}
                   className="py-4"

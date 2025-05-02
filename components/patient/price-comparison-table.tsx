@@ -8,80 +8,129 @@ import { Button } from "@/components/ui/button"
 import { MapPin, ExternalLink, Clock, Truck } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 
-// Mock pharmacy data
+// Update the mockPharmacies array with Indian pharmacy names and locations
 const mockPharmacies = [
   {
     id: "ph1",
-    name: "MediCare Pharmacy",
-    distance: 0.8,
-    address: "123 Health St, Medical District",
-    hours: "8:00 AM - 9:00 PM",
+    name: "Apollo Pharmacy",
+    distance: 1.2,
+    address: "123 MG Road, Bangalore",
+    hours: "8:00 AM - 10:00 PM",
     delivery: true,
-    insurance: ["Aetna", "Blue Cross", "Cigna"],
+    insurance: ["Star Health", "HDFC ERGO", "Bajaj Allianz"],
   },
   {
     id: "ph2",
-    name: "QuickMeds",
-    distance: 1.2,
-    address: "456 Wellness Ave, Care Center",
+    name: "MedPlus",
+    distance: 2.5,
+    address: "456 Koramangala Main Road, Bangalore",
     hours: "24 hours",
     delivery: true,
-    insurance: ["Blue Cross", "United Health", "Medicare"],
+    insurance: ["ICICI Lombard", "Aditya Birla Health", "Max Bupa"],
   },
   {
     id: "ph3",
-    name: "Family Pharmacy",
-    distance: 2.5,
-    address: "789 Community Blvd, Healthville",
-    hours: "9:00 AM - 7:00 PM",
+    name: "Wellness Forever",
+    distance: 3.8,
+    address: "789 HSR Layout, Bangalore",
+    hours: "9:00 AM - 11:00 PM",
     delivery: false,
-    insurance: ["Aetna", "Medicare", "Medicaid"],
+    insurance: ["Star Health", "Religare Health", "HDFC ERGO"],
   },
   {
     id: "ph4",
-    name: "City Drug Store",
-    distance: 3.1,
-    address: "101 Main St, Downtown",
-    hours: "8:00 AM - 8:00 PM",
+    name: "Netmeds Store",
+    distance: 4.7,
+    address: "101 Indiranagar, Bangalore",
+    hours: "8:00 AM - 9:00 PM",
     delivery: true,
-    insurance: ["Cigna", "United Health", "Kaiser"],
+    insurance: ["ICICI Lombard", "Max Bupa", "Aditya Birla Health"],
   },
 ]
 
-// Mock price data
+// Update the mockMedicinePrices with Indian prices
 const mockMedicinePrices = {
   med1: [
-    { pharmacyId: "ph1", price: 12.99, inStock: true, discount: null },
-    { pharmacyId: "ph2", price: 14.5, inStock: true, discount: null },
-    { pharmacyId: "ph3", price: 11.75, inStock: true, discount: "10% off with coupon" },
-    { pharmacyId: "ph4", price: 13.25, inStock: false, discount: null },
+    { pharmacyId: "ph1", price: 649, inStock: true, discount: null },
+    { pharmacyId: "ph2", price: 725, inStock: true, discount: null },
+    { pharmacyId: "ph3", price: 599, inStock: true, discount: "10% off with coupon" },
+    { pharmacyId: "ph4", price: 675, inStock: false, discount: null },
   ],
   med2: [
-    { pharmacyId: "ph1", price: 45.99, inStock: true, discount: "5% off with membership" },
-    { pharmacyId: "ph2", price: 42.5, inStock: true, discount: null },
-    { pharmacyId: "ph3", price: 48.75, inStock: false, discount: null },
-    { pharmacyId: "ph4", price: 43.25, inStock: true, discount: null },
+    { pharmacyId: "ph1", price: 2299, inStock: true, discount: "5% off with membership" },
+    { pharmacyId: "ph2", price: 2125, inStock: true, discount: null },
+    { pharmacyId: "ph3", price: 2450, inStock: false, discount: null },
+    { pharmacyId: "ph4", price: 2199, inStock: true, discount: null },
   ],
   med3: [
-    { pharmacyId: "ph1", price: 8.99, inStock: true, discount: null },
-    { pharmacyId: "ph2", price: 9.5, inStock: true, discount: "Buy one get one 50% off" },
-    { pharmacyId: "ph3", price: 7.75, inStock: true, discount: null },
-    { pharmacyId: "ph4", price: 8.25, inStock: true, discount: null },
+    { pharmacyId: "ph1", price: 449, inStock: true, discount: null },
+    { pharmacyId: "ph2", price: 475, inStock: true, discount: "Buy one get one 50% off" },
+    { pharmacyId: "ph3", price: 399, inStock: true, discount: null },
+    { pharmacyId: "ph4", price: 425, inStock: true, discount: null },
   ],
 }
 
+// Update the mockEquipmentPrices with Indian prices
 const mockEquipmentPrices = {
   eq1: [
-    { pharmacyId: "ph1", price: 49.99, inStock: true, discount: null },
-    { pharmacyId: "ph2", price: 54.5, inStock: true, discount: null },
-    { pharmacyId: "ph3", price: 47.75, inStock: false, discount: null },
-    { pharmacyId: "ph4", price: 52.25, inStock: true, discount: "Free batteries" },
+    { pharmacyId: "ph1", price: 2499, inStock: true, discount: null },
+    { pharmacyId: "ph2", price: 2699, inStock: true, discount: null },
+    { pharmacyId: "ph3", price: 2399, inStock: false, discount: null },
+    { pharmacyId: "ph4", price: 2599, inStock: true, discount: "Free batteries" },
   ],
   eq2: [
-    { pharmacyId: "ph1", price: 199.99, inStock: true, discount: "Free delivery" },
-    { pharmacyId: "ph2", price: 189.5, inStock: true, discount: null },
-    { pharmacyId: "ph3", price: 209.75, inStock: true, discount: null },
-    { pharmacyId: "ph4", price: 194.25, inStock: false, discount: null },
+    { pharmacyId: "ph1", price: 8999, inStock: true, discount: "Free delivery" },
+    { pharmacyId: "ph2", price: 8499, inStock: true, discount: null },
+    { pharmacyId: "ph3", price: 9299, inStock: true, discount: null },
+    { pharmacyId: "ph4", price: 8799, inStock: false, discount: null },
+  ],
+  eq3: [
+    { pharmacyId: "ph1", price: 35999, inStock: true, discount: "EMI available" },
+    { pharmacyId: "ph2", price: 36499, inStock: true, discount: null },
+    { pharmacyId: "ph3", price: 34999, inStock: false, discount: null },
+    { pharmacyId: "ph4", price: 35499, inStock: true, discount: "Free service for 1 year" },
+  ],
+  eq4: [
+    { pharmacyId: "ph1", price: 45999, inStock: false, discount: null },
+    { pharmacyId: "ph2", price: 44999, inStock: true, discount: "Free installation" },
+    { pharmacyId: "ph3", price: 46999, inStock: false, discount: null },
+    { pharmacyId: "ph4", price: 45499, inStock: true, discount: null },
+  ],
+  eq5: [
+    { pharmacyId: "ph1", price: 42999, inStock: true, discount: "10% cashback" },
+    { pharmacyId: "ph2", price: 43999, inStock: true, discount: null },
+    { pharmacyId: "ph3", price: 41999, inStock: true, discount: null },
+    { pharmacyId: "ph4", price: 42499, inStock: false, discount: null },
+  ],
+  eq6: [
+    { pharmacyId: "ph1", price: 2999, inStock: true, discount: null },
+    { pharmacyId: "ph2", price: 3199, inStock: true, discount: "Extra medication kit free" },
+    { pharmacyId: "ph3", price: 2899, inStock: true, discount: null },
+    { pharmacyId: "ph4", price: 3099, inStock: true, discount: null },
+  ],
+  eq7: [
+    { pharmacyId: "ph1", price: 6499, inStock: true, discount: "Free regulator" },
+    { pharmacyId: "ph2", price: 6799, inStock: true, discount: null },
+    { pharmacyId: "ph3", price: 6299, inStock: true, discount: null },
+    { pharmacyId: "ph4", price: 6599, inStock: false, discount: null },
+  ],
+  eq8: [
+    { pharmacyId: "ph1", price: 3499, inStock: true, discount: null },
+    { pharmacyId: "ph2", price: 3699, inStock: true, discount: null },
+    { pharmacyId: "ph3", price: 3299, inStock: true, discount: "5% senior citizen discount" },
+    { pharmacyId: "ph4", price: 3599, inStock: true, discount: null },
+  ],
+  eq9: [
+    { pharmacyId: "ph1", price: 1299, inStock: true, discount: "Free 25 strips" },
+    { pharmacyId: "ph2", price: 1399, inStock: true, discount: null },
+    { pharmacyId: "ph3", price: 1199, inStock: true, discount: null },
+    { pharmacyId: "ph4", price: 1349, inStock: true, discount: null },
+  ],
+  eq10: [
+    { pharmacyId: "ph1", price: 1499, inStock: true, discount: null },
+    { pharmacyId: "ph2", price: 1599, inStock: true, discount: null },
+    { pharmacyId: "ph3", price: 1399, inStock: true, discount: "10% off" },
+    { pharmacyId: "ph4", price: 1549, inStock: false, discount: null },
   ],
 }
 
@@ -177,7 +226,7 @@ export function PriceComparisonTable({ medicineId, equipmentId, type = "medicine
                 <TableRow key={item.pharmacyId}>
                   <TableCell className="font-medium">{pharmacy.name}</TableCell>
                   <TableCell>
-                    <div className="font-bold">${item.price.toFixed(2)}</div>
+                    <div className="font-bold">₹{item.price.toFixed(2)}</div>
                     {item.discount && (
                       <Badge variant="outline" className="text-green-600 border-green-600 text-xs mt-1">
                         {item.discount}
@@ -187,7 +236,7 @@ export function PriceComparisonTable({ medicineId, equipmentId, type = "medicine
                   <TableCell>
                     <div className="flex items-center">
                       <MapPin className="h-3 w-3 mr-1 text-muted-foreground" />
-                      <span>{pharmacy.distance} miles</span>
+                      <span>{pharmacy.distance} km</span>
                     </div>
                   </TableCell>
                   <TableCell>

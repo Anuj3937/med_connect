@@ -58,7 +58,7 @@ export function EquipmentCard({ equipment, onSelect, isSelected }: EquipmentCard
             </Badge>
           ))}
         </div>
-        <div className="font-medium">${price.toFixed(2)}</div>
+        <div className="font-medium">₹{price.toFixed(2)}</div>
       </CardContent>
       <CardFooter className="pt-0">
         <Button
