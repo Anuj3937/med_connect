@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { AlertCircle, FileText, TrendingUp, Download, Search } from "lucide-react"
+import { AlertCircle, FileText, TrendingUp, Download, Search, MessageSquare } from "lucide-react"
+import { HealthAssistantChat } from "@/components/patient/health-assistant-chat"
 
 // Mock lab results data
 const mockLabResults = [
@@ -224,6 +225,7 @@ export default function LabResultsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [dateFilter, setDateFilter] = useState("all")
   const [typeFilter, setTypeFilter] = useState("all")
+  const [showHealthAssistant, setShowHealthAssistant] = useState(false)
 
   // Filter lab results
   const filteredResults = mockLabResults.filter((result) => {
@@ -316,6 +318,13 @@ export default function LabResultsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <div className="flex justify-end mb-4">
+        <Button onClick={() => setShowHealthAssistant(true)} className="gap-2">
+          <MessageSquare className="h-4 w-4" />
+          Ask Health Assistant
+        </Button>
+      </div>
 
       <div className="grid gap-6 md:grid-cols-3">
         <div className="md:col-span-1 space-y-4">
@@ -451,6 +460,7 @@ export default function LabResultsPage() {
           )}
         </div>
       </div>
+      {showHealthAssistant && <HealthAssistantChat onClose={() => setShowHealthAssistant(false)} />}
     </div>
   )
 }
